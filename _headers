@@ -1,0 +1,11 @@
+# Dragon Ball Omega — cabeçalhos de segurança (Cloudflare lê este arquivo na raiz do site)
+# O Supabase do projeto já está liberado em connect-src e img-src (endereço exato, sem curinga).
+# Se trocar de projeto ou usar login com Google, ajuste aqui.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://fixrrteluhuaytqbpabi.supabase.co https://lh3.googleusercontent.com; connect-src 'self' https://formsubmit.co https://fixrrteluhuaytqbpabi.supabase.co; form-action 'self' https://formsubmit.co; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  # Enquanto o site estiver em fase de teste, fora dos buscadores. Apague esta linha ao lançar.
+  X-Robots-Tag: noindex, nofollow

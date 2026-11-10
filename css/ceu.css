@@ -1,0 +1,81 @@
+/* =========================================================
+   Dragon Ball Omega — identidade "céu" (criação de personagem)
+   Azul-céu com as nuvens nimbus ainda douradas, como se o personagem viajasse pelos céus.
+   Use <html class="ki ceu">; carregue DEPOIS de ki-theme.css.
+   Sumário: 1 Cores · 2 Céu · 3 Nuvens douradas · 4 Detalhes
+   ========================================================= */
+
+/* 1. Cores ----------------------------------------------- */
+:root.ceu {                          /* noite de céu: azul profundo no alto, azul-céu embaixo */
+  --bg: #0B4C94;
+  --surface: rgba(7, 38, 86, .88);
+  --jade: #FFE08A;                   /* hover do menu: dourado claro */
+  --gold: #FFD76A;
+  --text: #F3F9FF;
+  --muted: rgba(243, 249, 255, .82);
+  --line: rgba(255, 215, 106, .42);
+  --on-jade: #2A1A00;
+  --on-gold: #2A1A00;
+  --pat: rgba(255, 255, 255, .08);
+  --header: rgba(6, 40, 92, .9);
+  --grad-a: #F7B733;
+  --grad-b: #FFE08A;
+  --glow: rgba(255, 226, 140, .35);
+  --ceu-topo: #0A4690;
+  --ceu-meio: #1F73C0;
+  --ceu-base: #4DA3E6;
+  --nuvem-a: #FFDD6B;
+  --nuvem-b: #F0A41A;
+}
+:root.ceu[data-theme="light"] {       /* dia de céu limpo */
+  --bg: #BFE3FB;
+  --surface: rgba(255, 255, 255, .92);
+  --jade: #0B4C94;
+  --gold: #8A5A00;
+  --text: #0A2A52;
+  --muted: rgba(10, 42, 82, .8);
+  --line: rgba(138, 90, 0, .4);
+  --on-jade: #2A1A00;
+  --on-gold: #FFF8E1;
+  --pat: rgba(10, 74, 148, .08);
+  --header: rgba(220, 240, 255, .94);
+  --glow: rgba(255, 236, 170, .6);
+  --ceu-topo: #6DBDF1;
+  --ceu-meio: #A5D8F8;
+  --ceu-base: #E4F5FF;
+  --nuvem-a: #FFE08A;
+  --nuvem-b: #E0A526;
+}
+
+/* 2. Céu ------------------------------------------------- */
+.ceu body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 60% 38% at 82% -6%, var(--glow), transparent 70%),      /* o sol, lá em cima */
+    radial-gradient(ellipse 120% 30% at 50% 108%, rgba(255, 255, 255, .22), transparent 70%),  /* neblina do horizonte */
+    linear-gradient(180deg, var(--ceu-topo) 0%, var(--ceu-meio) 55%, var(--ceu-base) 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+.ceu .site-header { background: var(--header); backdrop-filter: blur(6px); }
+.ceu h1, .ceu .wizard__lead, .ceu .step__hint { text-shadow: 0 1px 10px rgba(5, 30, 70, .35); }
+.ceu[data-theme="light"] h1, .ceu[data-theme="light"] .wizard__lead, .ceu[data-theme="light"] .step__hint { text-shadow: 0 1px 8px rgba(255, 255, 255, .6); }
+.ceu .site-footer { color: var(--muted); }
+
+/* 3. Nuvens douradas ------------------------------------- */
+.ceu .nimbus i { background: linear-gradient(180deg, var(--nuvem-a), var(--nuvem-b)); filter: drop-shadow(0 4px 16px rgba(255, 200, 80, .45)); }
+.ceu .nimbus i:nth-child(1) { opacity: .72; }
+.ceu .nimbus i:nth-child(2) { opacity: .58; }
+.ceu .nimbus i:nth-child(3) { opacity: .66; }
+.ceu .nimbus i:nth-child(4) { opacity: .78; }
+.ceu .nimbus i:nth-child(5) { opacity: .5; }
+.ceu[data-theme="light"] .nimbus i { filter: drop-shadow(0 4px 12px rgba(224, 165, 38, .35)); }
+.ceu .loading .nimbus i { opacity: .75; }
+.ceu .loading { background-image: linear-gradient(180deg, var(--ceu-topo), var(--ceu-base)); }
+
+/* 4. Detalhes -------------------------------------------- */
+.ceu .panel, .ceu .choice__body, .ceu .attr, .ceu .points, .ceu .summary, .ceu .raceinfo, .ceu .attr-orb {
+  box-shadow: 0 6px 24px rgba(4, 28, 66, .22);
+}
+.ceu input[type="text"], .ceu input[type="number"], .ceu select { background-color: rgba(255, 255, 255, .08); }
+.ceu[data-theme="light"] input[type="text"], .ceu[data-theme="light"] input[type="number"], .ceu[data-theme="light"] select { background-color: #fff; }

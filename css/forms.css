@@ -1,0 +1,53 @@
+/* =========================================================
+   Dragon Ball Omega — formulários (Configurações e pop-up de Personagens)
+   Sumário: abas · campos e botões · mensagens
+   ========================================================= */
+
+[hidden] { display: none !important; }
+
+/* Abas */
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.tab {
+  flex: 1;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.tab:hover { border-color: var(--gold); }
+.tab[aria-selected="true"] { background: var(--jade); border-color: transparent; color: var(--on-jade); font-weight: 700; }
+
+/* 4. Formulários ----------------------------------------- */
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+.field label { font-weight: 500; }
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="text"],
+.field input[type="number"],
+.field textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.field textarea { min-height: 150px; resize: vertical; }
+.field input[type="file"] { color: var(--muted); font: inherit; font-size: .92rem; }
+.field input:focus, .field textarea:focus { border-color: var(--gold); }
+.field ::placeholder { color: var(--muted); opacity: .8; }
+.form .btn { width: 100%; }
+button.btn { font: inherit; font-weight: 700; cursor: pointer; }
+.btn:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* 5. Mensagens ------------------------------------------- */
+.msg { min-height: 1.4em; margin: 12px 0 0; font-size: .95rem; color: var(--muted); }
+.msg--error { color: var(--danger); }
+.msg--ok { color: var(--jade); font-weight: 700; }
+.wait { margin: 0 0 12px; color: var(--gold); font-size: .95rem; }

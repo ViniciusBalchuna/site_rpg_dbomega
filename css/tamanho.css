@@ -1,0 +1,13 @@
+/* Tamanho do NPC no mapa (js/tamanho.js): ficha do NPC e "Adicionar NPC" da Sessão */
+.tam { margin: 4px 0 8px; padding: 0; border: 0; }
+.tam__leg { margin-bottom: 8px; padding: 0; font-weight: 700; }
+.tam__opcoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+.tam__op { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.tam__op:has(input:checked) { border-color: var(--gold, #E9A23B); background: color-mix(in srgb, var(--gold, #E9A23B) 14%, transparent); }
+.tam__op input { width: 18px; height: 18px; accent-color: var(--gold, #E9A23B); }
+.tam__txt { display: grid; line-height: 1.2; }
+.tam__txt small { color: var(--muted); font-size: .78rem; }
+.tam__n { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: 700; }
+.tam__n[hidden] { display: none; }
+.tam__num { width: 90px; min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); font: inherit; }
+.tam-dlg { width: min(94vw, 520px); }

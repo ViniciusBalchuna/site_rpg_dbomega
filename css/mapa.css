@@ -1,0 +1,332 @@
+/* =========================================================
+   Dragon Ball Omega — editor de mapas (campanha/mapas.html) e seletor de cor (js/cor.js)
+   Sumário: 1 Tela cheia · 2 Título · 3 Caixas do topo · 4 Barra de ferramentas e menus · 5 Zoom e dica
+            6 Seletor de cor · 7 Janelas · 8 Celular
+   ========================================================= */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* 1. Tela cheia ------------------------------------------- */
+.mp-ativo .site-footer, .mp-ativo .camp { display: none; }
+.mp-ativo .page { padding: 0; }
+.mapa-app { display: none; }
+.mp-ativo .mapa-app { display: block; position: fixed; left: 0; right: 0; bottom: 0; top: var(--mp-topo, 64px); z-index: 2; }
+.mp { position: absolute; inset: 0; overflow: hidden; user-select: none; -webkit-user-select: none; }
+.mp-tela { position: absolute; inset: 0; display: block; touch-action: none; cursor: crosshair; outline: none; }
+.mp-tela:focus-visible { box-shadow: inset 0 0 0 3px #1D3FA8; }
+.mp[data-ferr="regua"] .mp-tela { cursor: cell; }
+.mp.is-sobre-token .mp-tela { cursor: grab; }
+.mp.is-segurando .mp-tela { cursor: grabbing; }
+.mp.is-mao .mp-tela { cursor: grab; }
+.mp.is-movendo .mp-tela { cursor: grabbing; }
+
+/* 2. Título ----------------------------------------------- */
+.mp-titulo { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 8px; max-width: min(46vw, 640px);
+  padding: 6px 10px 6px 18px; border: 1px solid rgba(21, 26, 58, .16); border-radius: 999px; background: rgba(255, 255, 255, .92); box-shadow: 0 6px 22px rgba(21, 26, 58, .16); color: #151A3A; }
+.mp-titulo__txt { margin: 0; padding: 0; border: 0; font-family: var(--serif); font-size: 1.15rem; line-height: 1.3; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-titulo__editar { flex: none; width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #1D3FA8; cursor: pointer; }
+.mp-titulo__editar svg { width: 17px; height: 17px; }
+.mp-titulo__editar:hover { background: rgba(29, 63, 168, .1); }
+.mp-titulo__editar:focus-visible { outline: 3px solid #1D3FA8; outline-offset: 1px; }
+.mp-titulo.is-editando .mp-titulo__editar { display: none; }
+.mp-titulo__inp { width: min(40vw, 520px); padding: 4px 8px; border: 1px solid #1D3FA8; border-radius: 8px; background: #fff; color: #151A3A; font-family: var(--serif); font-size: 1.1rem; }
+
+/* 3. Caixas do topo --------------------------------------- */
+.mp-caixa { position: absolute; z-index: 3; display: grid; gap: 8px; padding: 12px; border: 1px solid rgba(21, 26, 58, .16); border-radius: 14px; background: rgba(255, 255, 255, .92); box-shadow: 0 8px 26px rgba(21, 26, 58, .18); }
+.mp-caixa--esq { left: 14px; top: 14px; }
+.mp-voltar { color: #1D3FA8; font-weight: 700; text-decoration: none; font-size: .92rem; }
+.mp-voltar:hover { text-decoration: underline; }
+.mp-token-btn { min-height: 40px; padding: 0 16px; font-size: .92rem; }
+/* bloco antigo, quase ancestral: pergaminho com moldura dupla e selo */
+.mp-antigo { position: absolute; right: 14px; top: 10px; z-index: 3; display: grid; gap: 8px; min-width: 190px; padding: 16px 18px 18px; color: #3A2210;
+  background: radial-gradient(ellipse at 30% 20%, rgba(255, 246, 214, .8), transparent 60%), radial-gradient(circle at 80% 85%, rgba(120, 76, 28, .22), transparent 40%), linear-gradient(170deg, #EEDDB0, #D9BE84);
+  border: 1px solid #8C6230; border-radius: 4px;
+  box-shadow: inset 0 0 0 4px rgba(238, 221, 176, .9), inset 0 0 0 5px rgba(110, 66, 24, .55), inset 0 0 26px rgba(96, 58, 18, .45), 0 10px 26px rgba(40, 24, 8, .35); }
+.mp-antigo::before { content: ""; position: absolute; left: 50%; top: -11px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #D9483A, #8E1F14); box-shadow: 0 2px 4px rgba(0, 0, 0, .4); }
+.mp-antigo__rot { font-family: "Cinzel", var(--serif); font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; text-align: center; color: rgba(70, 40, 14, .75); }
+.mp-antigo__btn { display: block; min-height: 40px; padding: 9px 14px; border: 1px solid #7A5226; border-radius: 3px; background: linear-gradient(180deg, rgba(255, 248, 225, .65), rgba(196, 160, 100, .35)); color: #3A2210; font: inherit; font-family: var(--serif); font-weight: 800; text-align: center; cursor: pointer; }
+.mp-antigo__btn:hover { background: linear-gradient(180deg, #FFF3D0, #D9BE84); }
+.mp-antigo__btn:focus-visible, .mp-antigo__btn:focus-within { outline: 3px solid #8E1F14; outline-offset: 2px; }
+
+/* 4. Barra de ferramentas e menus ------------------------- */
+.mp-barra { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 6px; padding: 8px; border: 1px solid rgba(21, 26, 58, .18); border-radius: 18px; background: rgba(255, 255, 255, .95); box-shadow: 0 12px 34px rgba(21, 26, 58, .25); }
+.mp-ferr-wrap { position: relative; }
+.mp-ferr { position: relative; width: 46px; height: 46px; display: grid; place-items: center; padding: 0; border: 1px solid transparent; border-radius: 12px; background: transparent; color: #26304F; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.mp-ferr svg { width: 24px; height: 24px; }
+.mp-ferr:hover { background: rgba(29, 63, 168, .08); }
+.mp-ferr[aria-pressed="true"] { background: #1D3FA8; color: #fff; border-color: #1D3FA8; }
+.mp-ferr:focus-visible { outline: 3px solid #1D3FA8; outline-offset: 2px; }
+.mp-ferr__mais { position: absolute; right: 4px; bottom: 4px; width: 0; height: 0; border-left: 5px solid transparent; border-bottom: 5px solid currentColor; opacity: .7; }
+/* a caneta mostra o que vai desenhar (espaço = branco, parede = marrom) */
+.mp-ferr[data-ferr="caneta"]::after { content: ""; position: absolute; left: 6px; bottom: 6px; width: 9px; height: 9px; border: 1px solid #26304F; border-radius: 2px; background: #fff; }
+.mp-ferr[data-ferr="caneta"].is-sub-parede::after { background: #6B4423; }
+.mp-ferr[data-ferr="caneta"][aria-pressed="true"]::after { border-color: #fff; }
+.mp-ferr--cor { padding: 8px; }
+.mp-cor-amostra { width: 100%; height: 100%; border-radius: 8px; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(21, 26, 58, .3), inset 0 0 0 1px rgba(0, 0, 0, .06);
+  background-color: #fff; }
+.mp-ferr--cor { background: repeating-conic-gradient(#E3E7EE 0 25%, #fff 0 50%) 0 0 / 10px 10px; }
+.mp-menu { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); display: flex; gap: 6px; padding: 6px; border: 1px solid rgba(21, 26, 58, .18); border-radius: 14px; background: #fff; box-shadow: 0 10px 28px rgba(21, 26, 58, .25); animation: mp-menu-in .16s ease-out; }
+.mp-menu::after { content: ""; position: absolute; left: 50%; bottom: -12px; width: 100%; height: 12px; transform: translateX(-50%); }   /* ponte: o mouse passa da ferramenta para o menu sem fechar */
+.mp-menu[hidden] { display: none; }
+@keyframes mp-menu-in { from { opacity: 0; transform: translate(-50%, 6px); } }
+.mp-menu__item { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 1px solid transparent; border-radius: 10px; background: transparent; cursor: pointer; }
+.mp-menu__item svg { width: 26px; height: 26px; color: #26304F; }
+.mp-menu__item:hover { background: rgba(29, 63, 168, .08); }
+.mp-menu__item[aria-checked="true"] { border-color: #1D3FA8; background: rgba(29, 63, 168, .1); }
+.mp-menu__item:focus-visible { outline: 3px solid #1D3FA8; outline-offset: 1px; }
+.mp-sim { display: block; width: 26px; height: 26px; border-radius: 4px; }
+.mp-sim--espaco { background: #fff; box-shadow: 0 0 0 1.5px #26304F; }
+.mp-sim--parede { background: #6B4423; box-shadow: 0 0 0 1.5px #3A2414; }
+.mp-sim--muro { background: linear-gradient(90deg, transparent 42%, #3A2414 42%, #3A2414 58%, transparent 58%), #EFE6D2; box-shadow: 0 0 0 2px #3A2414; }
+.mp-sim--borda { background: #fff; box-shadow: inset 0 0 0 5px #6B4423, 0 0 0 1.5px #3A2414; }
+.mp-sim--redondo { border-radius: 50%; }
+.mp-menu--lista { flex-direction: column; align-items: stretch; min-width: 210px; left: auto; right: -8px; transform: none; animation-name: mp-menu-in2; }
+@keyframes mp-menu-in2 { from { opacity: 0; transform: translateY(6px); } }
+.mp-menu__opt { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: #151A3A; font: inherit; text-align: left; cursor: pointer; }
+.mp-menu__opt:hover { background: rgba(29, 63, 168, .08); }
+.mp-menu__opt input { width: 18px; height: 18px; accent-color: #1D3FA8; }
+
+/* 5. Zoom e dica ------------------------------------------ */
+.mp-zoom { position: absolute; right: 14px; bottom: 16px; z-index: 3; display: flex; align-items: center; overflow: hidden; border: 1px solid rgba(21, 26, 58, .18); border-radius: 12px; background: rgba(255, 255, 255, .95); box-shadow: 0 8px 22px rgba(21, 26, 58, .2); }
+.mp-zoom__btn, .mp-zoom__txt { height: 38px; min-width: 38px; padding: 0 10px; border: 0; background: transparent; color: #26304F; font: inherit; font-weight: 700; cursor: pointer; }
+.mp-zoom__txt { min-width: 64px; font-size: .88rem; font-variant-numeric: tabular-nums; border-left: 1px solid rgba(21, 26, 58, .12); border-right: 1px solid rgba(21, 26, 58, .12); }
+.mp-zoom__btn:hover, .mp-zoom__txt:hover { background: rgba(29, 63, 168, .08); }
+.mp-dica { position: absolute; z-index: 5; transform: translateX(-50%); padding: 6px 12px; border-radius: 8px; background: #151A3A; color: #fff; font-size: .9rem; font-weight: 700; white-space: nowrap; pointer-events: none; box-shadow: 0 6px 16px rgba(0, 0, 0, .3); }
+.mp-dica[hidden] { display: none; }
+
+/* 6. Seletor de cor --------------------------------------- */
+.cor-dlg { width: min(94vw, 420px); }
+.cor-corpo { display: flex; gap: 14px; margin: 6px 0 14px; }
+.cor-quad { position: relative; flex: 1 1 auto; aspect-ratio: 1; min-height: 200px; border-radius: 8px; cursor: crosshair; touch-action: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.cor-quad:focus-visible, .cor-barra:focus-visible { outline: 3px solid var(--jade, #1D3FA8); outline-offset: 2px; }
+.cor-pino { position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px rgba(0, 0, 0, .5), 0 2px 4px rgba(0, 0, 0, .4); pointer-events: none; }
+.cor-barras { display: flex; gap: 10px; }
+.cor-barra { position: relative; width: 24px; border-radius: 6px; cursor: ns-resize; touch-action: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.cor-barra--matiz { background: linear-gradient(to bottom, #f00 0%, #ff0 16.67%, #0f0 33.33%, #0ff 50%, #00f 66.67%, #f0f 83.33%, #f00 100%); }
+.cor-barra--opac { background: repeating-conic-gradient(#ccc 0 25%, #fff 0 50%) 0 0 / 10px 10px; overflow: hidden; }
+.cor-barra__fundo { position: absolute; inset: 0; border-radius: 6px; }
+.cor-barra__pino { position: absolute; left: -3px; right: -3px; height: 8px; margin-top: -4px; border: 2px solid #fff; border-radius: 4px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .5); pointer-events: none; }
+.cor-linha { display: flex; align-items: center; gap: 10px; }
+.cor-amostra { flex: none; width: 46px; height: 40px; overflow: hidden; border-radius: 8px; background: repeating-conic-gradient(#ccc 0 25%, #fff 0 50%) 0 0 / 10px 10px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.cor-amostra span { display: block; width: 100%; height: 100%; }
+.cor-txt { flex: 1 1 auto; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid var(--line, #ccd); border-radius: 8px; background: var(--bg, #fff); color: var(--text, #111); font: 600 .95rem ui-monospace, Consolas, monospace; }
+.cor-txt.is-erro { border-color: #E0455A; box-shadow: 0 0 0 2px rgba(224, 69, 90, .25); }
+
+/* 7. Janelas (modal) e aviso ------------------------------ */
+.modal { width: min(92vw, 460px); max-height: 90dvh; margin: auto; padding: 24px 22px 18px; overflow: auto; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 24px 70px rgba(0, 0, 0, .6); }
+.modal::backdrop { background: rgba(6, 8, 26, .6); backdrop-filter: blur(2px); }
+.modal h2 { margin: 0 0 10px; padding: 0; border: 0; font-size: 1.35rem; }
+.modal__actions { display: flex; gap: 10px; margin-top: 14px; }
+.modal__actions .btn { flex: 1 1 0; justify-content: center; }
+.modal__close { float: right; width: 34px; height: 34px; display: grid; place-items: center; margin: -8px -6px 0 10px; padding: 0; border: 0; border-radius: 50%; background: #B3261E; color: #fff; font: inherit; font-size: 1.35rem; line-height: 1; cursor: pointer; }
+.modal .field { margin: 0 0 12px; }
+.modal .field select { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
+.mp-exp__chk { display: flex; align-items: center; gap: 10px; }
+.mp-exp__chk input { width: 18px; height: 18px; }
+.mp-exp__info { margin: 10px 0 0; color: var(--muted); font-size: .9rem; }
+.toast { position: fixed; inset: calc(var(--mp-topo, 64px) + 68px) auto auto 50%; margin: 0; width: max-content; max-width: min(92vw, 480px); transform: translateX(-50%); padding: 12px 18px; border: 1px solid #8FBCFF; border-radius: 10px; background: #0B2347; color: #fff; font-weight: 700; box-shadow: 0 10px 30px rgba(0, 0, 0, .4); }
+.toast:empty { display: none; }
+
+/* 8. Celular ---------------------------------------------- */
+@media (max-width: 760px) {
+  .mp-titulo { top: 10px; left: 50%; max-width: 54vw; padding-left: 12px; }
+  .mp-titulo__txt { font-size: .98rem; }
+  .mp-caixa--esq { top: 62px; left: 8px; padding: 8px; max-width: calc(50vw - 14px); }
+  .mp-token-btn { font-size: .8rem; min-height: 34px; padding: 4px 10px; white-space: normal; line-height: 1.2; }
+  .mp-antigo { top: 62px; right: 8px; min-width: 0; max-width: calc(50vw - 14px); padding: 12px; }
+  .mp-antigo__rot { display: none; }
+  .mp-antigo__btn { min-height: 34px; padding: 6px 10px; font-size: .85rem; }
+  .mp-barra { bottom: 64px; gap: 2px; padding: 6px; max-width: calc(100vw - 16px); }
+  .mp-ferr { width: 40px; height: 40px; }
+  .mp-zoom { bottom: 12px; right: 50%; transform: translateX(50%); }
+}
+@media (prefers-reduced-motion: reduce) { .mp-menu { animation: none; } }
+/* Régua: escolha do ângulo do cone dentro do menu */
+.mp-ferr-wrap:has(> [data-ferr="regua"]) .mp-menu, .mp-ferr-wrap:has(> [data-ferr="explosao"]) .mp-menu { flex-wrap: wrap; justify-content: center; width: 196px; }
+.mp-menu__angulo { flex: 1 1 100%; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 8px; padding: 6px 6px 4px; border-top: 1px solid rgba(21, 26, 58, .12); color: #151A3A; font-size: .8rem; font-weight: 700; }
+.mp-menu__angulo label { grid-column: 1 / -1; }
+.mp-menu__angulo input { width: 100%; accent-color: #E0455A; }
+.mp-menu__angulo-val { min-width: 42px; text-align: right; font-variant-numeric: tabular-nums; color: #E0455A; }
+/* Limpar tudo: botão de perigo no pergaminho e na confirmação */
+.mp-antigo__btn--perigo { margin-top: 4px; border-color: #8E1F14; color: #8E1F14; background: linear-gradient(180deg, rgba(255, 236, 225, .6), rgba(214, 140, 120, .3)); }
+.mp-antigo__btn--perigo:hover { background: #8E1F14; color: #FFF3E6; }
+.mp-limpar__txt { margin: 0; color: var(--muted); }
+.mp-btn-perigo, .clash .btn.mp-btn-perigo { background: #B3261E !important; border-color: #B3261E !important; color: #FFF3F1 !important; box-shadow: none; }
+
+/* =========================================================
+   9. Mapa dentro da Sessão (campanha/combate.html): caixa do centro
+   ========================================================= */
+.mp--sessao { border-radius: inherit; }
+.mp--sessao .mp-tela { border-radius: inherit; }
+.mp--jogador .mp-tela { cursor: grab; }
+.mp--sessao.is-sobre-token .mp-tela { cursor: grab; }
+.mp--sessao .mp-titulo { top: 10px; max-width: calc(100% - 290px); padding: 4px 8px 4px 14px; }
+.mp--sessao .mp-titulo__txt { font-size: 1rem; }
+.mp--jogador .mp-titulo { padding-right: 14px; }
+/* pergaminho dobrado no canto de cima, à esquerda; abre ao clicar */
+.mp--sessao .mp-antigo { left: 10px; right: auto; top: 14px; min-width: 0; padding: 8px 10px; gap: 6px; }
+.mp--sessao .mp-antigo::before { top: -9px; width: 16px; height: 16px; margin-left: -8px; }
+.mp-antigo__corpo { display: grid; gap: 8px; }
+.mp--sessao .mp-antigo__corpo { display: none; min-width: 150px; }
+.mp--sessao .mp-antigo.is-aberto .mp-antigo__corpo { display: grid; }
+.mp-antigo__abrir { display: block; padding: 4px 6px; border: 0; background: transparent; color: rgba(70, 40, 14, .9); cursor: pointer; font-size: .7rem; }
+.mp-antigo__abrir::after { content: " ▾"; letter-spacing: 0; }
+.mp-antigo.is-aberto .mp-antigo__abrir::after { content: " ▴"; }
+.mp-antigo__abrir:focus-visible { outline: 3px solid #8E1F14; outline-offset: 2px; }
+.mp--sessao .mp-antigo__btn { min-height: 36px; padding: 6px 12px; font-size: .9rem; }
+.mp--sessao .mp-antigo__btn--perigo { margin-top: 2px; }
+/* personagens da sessão: coluna à direita */
+.mp-bandeja { position: absolute; right: 10px; top: 10px; z-index: 3; display: flex; flex-direction: column; gap: 6px; width: 92px; max-height: calc(100% - 150px); padding: 8px 6px; border: 1px solid rgba(21, 26, 58, .16); border-radius: 14px; background: rgba(255, 255, 255, .92); box-shadow: 0 8px 22px rgba(21, 26, 58, .2); color: #151A3A; transition: background .15s, box-shadow .15s; }
+.mp-bandeja__rot { font-size: .6rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; text-align: center; color: #4A5470; }
+.mp-bandeja__lista { display: grid; gap: 4px; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
+.mp-bandeja__vazio { padding: 6px 2px; font-size: .75rem; text-align: center; color: #5A6380; }
+.mp-bandeja__item { position: relative; display: grid; justify-items: center; gap: 3px; width: 100%; padding: 6px 2px 5px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: inherit; font: inherit; cursor: grab; touch-action: none; }
+.mp-bandeja__item:hover { background: rgba(29, 63, 168, .08); }
+.mp-bandeja__item:focus-visible { outline: 3px solid #1D3FA8; outline-offset: 1px; }
+.mp-bandeja__item.is-no-mapa, .mp-bandeja__item.is-bloq { cursor: default; }
+.mp-bandeja__item.is-bloq { opacity: .5; }
+.mp-bandeja__item.is-no-mapa .mp-bandeja__foto { filter: saturate(.55); }
+/* retrato com borda prateada (igual ao token no mapa) */
+.mp-bandeja__foto { display: grid; place-items: center; width: 48px; height: 48px; margin: 4px 0 2px; overflow: hidden; border-radius: 50%; background: #2A3354; color: #E6E9EE; font-weight: 700; font-size: 1.2rem;
+  box-shadow: 0 0 0 3px #C9CED5, 0 0 0 4px rgba(20, 24, 32, .45), 0 3px 8px rgba(0, 0, 0, .3); }
+.mp-bandeja__foto img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; pointer-events: none; }
+.mp-bandeja__nome { max-width: 100%; overflow: hidden; font-size: .72rem; font-weight: 700; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.mp-bandeja__ok { position: absolute; top: 4px; right: 10px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #2E9E6E; color: #fff; font-size: .7rem; font-weight: 700; box-shadow: 0 0 0 2px #fff; }
+.mp-bandeja__tirar { display: none; padding: 6px 4px; border: 2px dashed #B3261E; border-radius: 10px; color: #B3261E; font-size: .7rem; font-weight: 700; text-align: center; line-height: 1.25; }
+.mp--sessao.is-segurando:not(.mp--jogador) .mp-bandeja__tirar { display: block; }
+.mp--sessao.is-segurando:not(.mp--jogador) .mp-bandeja { background: rgba(255, 236, 232, .96); }
+.mp--sessao.is-soltando .mp-tela { cursor: copy; }
+/* retrato que segue o mouse enquanto se arrasta um personagem da lista */
+.mp-fantasma { position: fixed; z-index: 1000; transform: translate(-50%, -70%) scale(1.05); pointer-events: none; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .4)); transition: transform .12s; }
+.mp-fantasma .mp-bandeja__foto { width: 54px; height: 54px; }
+.mp-fantasma.is-sobre { transform: translate(-50%, -85%) scale(1.12); }
+/* ferramentas e zoom menores dentro da caixa */
+.mp--sessao .mp-barra { bottom: 10px; gap: 2px; padding: 5px; border-radius: 14px; }
+.mp--sessao .mp-ferr { width: 38px; height: 38px; border-radius: 10px; }
+.mp--sessao .mp-ferr svg { width: 21px; height: 21px; }
+.mp--sessao .mp-ferr[data-ferr="caneta"]::after { left: 4px; bottom: 4px; width: 7px; height: 7px; }
+.mp--sessao .mp-zoom { right: 10px; bottom: 10px; flex-direction: column; }
+.mp--sessao .mp-zoom__btn, .mp--sessao .mp-zoom__txt { height: 32px; min-width: 44px; padding: 0 6px; }
+.mp--sessao .mp-zoom__txt { min-width: 44px; border: 0; border-top: 1px solid rgba(21, 26, 58, .12); border-bottom: 1px solid rgba(21, 26, 58, .12); font-size: .76rem; }
+@media (max-width: 760px) {
+  .mp--sessao .mp-titulo { top: 56px; left: 8px; transform: none; max-width: calc(100% - 104px); }
+  .mp--jogador .mp-titulo { top: 10px; }
+  .mp-bandeja__rot { font-size: .55rem; letter-spacing: 0; }
+  .mp--sessao .mp-antigo { top: 12px; left: 8px; right: auto; max-width: none; padding: 6px 8px; }
+  .mp--sessao .mp-barra { bottom: 8px; max-width: calc(100% - 70px); left: calc(50% - 26px); overflow-x: auto; }
+  .mp--sessao .mp-ferr { width: 34px; height: 34px; }
+  .mp--sessao .mp-zoom { right: 8px; bottom: 8px; left: auto; transform: none; }
+  .mp-bandeja { width: 76px; right: 8px; top: 8px; max-height: calc(100% - 140px); }
+  .mp-bandeja__foto { width: 40px; height: 40px; }
+}
+.mp--sessao.is-sobre-lista .mp-bandeja { background: #FFE1DB; box-shadow: 0 0 0 3px #B3261E, 0 8px 22px rgba(21, 26, 58, .2); }
+/* Explosão: o ângulo do cone em laranja; prévia do quadrado de apagar em vermelho */
+.mp-ferr-wrap:has(> [data-ferr="explosao"]) .mp-menu__angulo input { accent-color: #E0642C; }
+.mp-ferr-wrap:has(> [data-ferr="explosao"]) .mp-menu__angulo-val { color: #B4471C; }
+.mp-ferr[data-ferr="explosao"][aria-pressed="true"] { background: #FFE6D6; border-color: #E0642C; }
+.mp-antigo__sub { display: block; margin-top: 1px; font-family: var(--sans, system-ui, sans-serif); font-size: .68rem; font-weight: 600; letter-spacing: .02em; opacity: .72; }
+/* Engrenagem: grossura da grade e cor do fundo do mapa */
+.mp-menu__esp { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; padding-top: 6px; padding-bottom: 8px; cursor: default; }
+.mp-menu__esp:hover { background: transparent; }
+.mp-menu__esp label { grid-column: 1 / -1; font-weight: 600; }
+.mp-menu__esp input { width: 100%; accent-color: #1D3FA8; }
+.mp-menu__esp-val { min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: #1D3FA8; }
+.mp-menu__amostra { flex: none; width: 18px; height: 18px; border-radius: 5px; box-shadow: 0 0 0 1px rgba(21, 26, 58, .35); }
+.mp-menu__amostra.is-vazia { background: repeating-conic-gradient(#D5DAE3 0 25%, #fff 0 50%) 0 0 / 8px 8px !important; }
+.mp-menu__opt--leve { min-height: 32px; font-size: .85rem; color: #4A5470; }
+.mp-menu__opt[hidden] { display: none; }
+.mp-menu--lista { min-width: 240px; }
+/* Relevo: botão antes da caneta (mostra o relevo escolhido) */
+.mp-ferr--relevo[data-relevo="normal"] { color: #8A93A8; }
+.mp-ferr--relevo[data-relevo="agua"] { background: rgba(61, 139, 208, .12); }
+.mp-ferr--relevo[data-relevo^="escada"] { color: #7A4E22; }
+.mp-menu__item--relevo svg { color: #26304F; }
+.mp-menu__item--relevo[data-relevo^="escada"] svg { color: #7A4E22; }
+.mp-menu__item--layers { border-left: 1px solid rgba(21, 26, 58, .12); border-radius: 0 10px 10px 0; color: #1D3FA8; }
+/* Layer em que o mestre desenha: ícone de andares com o número */
+.mp-ferr--layer { color: #1D3FA8; }
+.mp-ferr__num { position: absolute; right: 3px; bottom: 2px; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 8px; background: #1D3FA8; color: #fff; font: 800 .68rem/16px system-ui, sans-serif; text-align: center; font-variant-numeric: tabular-nums; }
+.mp-layers__lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 46vh; overflow: auto; }
+.mp-layers__item { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line, rgba(21, 26, 58, .18)); border-radius: 10px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.mp-layers__item:hover { border-color: #1D3FA8; }
+.mp-layers__item:focus-visible { outline: 3px solid #1D3FA8; outline-offset: 2px; }
+.mp-layers__item.is-atual { border-color: #1D3FA8; box-shadow: inset 0 0 0 1px #1D3FA8; background: rgba(29, 63, 168, .08); }
+.mp-layers__item small { color: var(--muted); }
+.mp-layers__novos { display: flex; flex-wrap: wrap; gap: 8px; }
+.mp-layers__novos .btn { flex: 1 1 180px; }
+/* Mestre: área de um jogador (clique no zoom) */
+.mp-rec__lab { font-weight: 700; }
+.mp-rec__sel { min-height: 44px; padding: 8px 10px; border: 1px solid var(--line, rgba(21, 26, 58, .25)); border-radius: 10px; font: inherit; }
+.mp.is-recortando .mp-tela { cursor: crosshair; }
+.mp--sessao:not(.mp--jogador) .mp-zoom__txt { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+/* Ações do token (voar, submergir...) */
+.mp-tkmenu { position: absolute; z-index: 6; display: grid; gap: 6px; min-width: 150px; padding: 10px; border: 1px solid rgba(21, 26, 58, .18); border-radius: 12px; background: #fff; color: #151A3A; box-shadow: 0 12px 30px rgba(21, 26, 58, .28); animation: mp-menu-in2 .14s ease-out; }
+.mp-tkmenu__nome { font-size: .92rem; }
+.mp-tkmenu__estado { margin-top: -4px; font-size: .74rem; font-weight: 600; color: #5A6380; }
+.mp-tkmenu__btn { min-height: 36px; padding: 0 12px; border: 1px solid #1D3FA8; border-radius: 9px; background: #1D3FA8; color: #fff; font: inherit; font-weight: 700; cursor: pointer; text-align: left; }
+.mp-tkmenu__btn:hover { filter: brightness(1.1); }
+.mp-tkmenu__btn:focus-visible { outline: 3px solid #E9A23B; outline-offset: 2px; }
+.mp-tkmenu__btn--voar::before { content: "↑ "; }
+.mp-tkmenu__btn--agua { border-color: #2F7FC8; background: #3D8BD0; }
+/* Conta-gotas: cursor e a cor que vai ser copiada ao lado do mouse */
+.mp.is-gotas .mp-tela { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M15.2 3.6a2.6 2.6 0 0 1 3.7 3.7l-2 2 .9.9-1.4 1.4-.9-.9-7.6 7.6L4 19.6l.3-4 7.6-7.6-.9-.9 1.4-1.4.9.9z' fill='white' stroke='%23151A3A' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E") 3 21, crosshair; }
+.mp-dica--gota { display: flex; align-items: center; gap: 8px; }
+.mp-dica--gota::before { content: ""; width: 16px; height: 16px; border-radius: 4px; background: var(--gota, transparent); box-shadow: 0 0 0 2px #fff; }
+.mp-menu__icone { display: grid; place-items: center; width: 18px; height: 18px; color: #26304F; }
+.mp-menu__icone svg { width: 18px; height: 18px; }
+/* Lista de personagens: linha "NPCs" separando os NPCs dos jogadores (só o mestre vê os NPCs aqui) */
+.mp-bandeja__sep { display: flex; align-items: center; gap: 4px; margin: 4px 0 2px; color: #8E1F14; font-size: .62rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.mp-bandeja__sep::before, .mp-bandeja__sep::after { content: ""; flex: 1 1 auto; height: 1px; background: rgba(142, 31, 20, .45); }
+
+/* =========================================================
+   10. Olho do mestre (ver como um jogador/NPC) e modo caverna
+   ========================================================= */
+.mp-ferr--olho.is-on { background: #1D3FA8; color: #fff; }
+.mp-menu--olho { min-width: 240px; max-height: 320px; overflow-y: auto; }
+.mp-menu__tit { padding: 6px 12px 4px; color: #4A5470; font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.mp-menu__vazio { padding: 6px 12px 10px; color: #5A6380; font-size: .85rem; }
+.mp-menu__opt--olho { flex-direction: column; align-items: flex-start; justify-content: center; gap: 0; min-height: 44px; }
+.mp-menu__opt--olho small { color: #5A6380; font-size: .75rem; }
+.mp-menu__opt--olho[aria-checked="true"] { background: rgba(29, 63, 168, .1); box-shadow: inset 3px 0 0 #1D3FA8; }
+.mp-vendo { position: absolute; left: 50%; top: 58px; transform: translateX(-50%); z-index: 4; width: max-content; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; max-width: calc(100% - 24px); padding: 6px 8px 6px 14px; border-radius: 999px; background: #1D3FA8; color: #fff; font-size: .88rem; box-shadow: 0 8px 22px rgba(21, 26, 58, .3); }
+.mp-vendo[hidden] { display: none; }
+.mp-vendo small { opacity: .85; }
+.mp-vendo__x { min-height: 32px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 999px; background: transparent; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.mp-vendo__x:hover { background: rgba(255, 255, 255, .15); }
+.mp-vendo__x:focus-visible { outline: 3px solid #FFD65A; outline-offset: 2px; }
+.mp.is-mirando .mp-tela { cursor: crosshair; }
+.mp-tkmenu__btn--luz { border-color: #B8860B; background: #C9A227; color: #1A1200; }
+@media (max-width: 640px) { .mp-vendo { top: 104px; font-size: .8rem; } }
+
+/* =========================================================
+   11. Paredes finas, névoa, texto e tela cheia
+   ========================================================= */
+/* Névoa e texto ficam numa barrinha em cima, à direita (a de baixo já está cheia); os menus abrem para baixo */
+.mp-topo { position: absolute; top: 14px; right: 14px; z-index: 4; display: flex; gap: 6px; padding: 6px; border: 1px solid rgba(21, 26, 58, .16); border-radius: 14px; background: rgba(255, 255, 255, .95); box-shadow: 0 8px 22px rgba(21, 26, 58, .18); }
+.mp-topo .mp-menu { bottom: auto; top: calc(100% + 10px); left: auto; right: -6px; transform: none; }
+.mp--sessao .mp-topo { top: 10px; right: 10px; padding: 4px; }
+@media (max-width: 640px) { .mp-topo { top: 56px; right: 8px; } .mp--sessao .mp-topo { top: 104px; } }
+/* Cursor do texto: caixinha pontilhada com um "t" embaixo */
+.mp[data-ferr="texto"] .mp-tela { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Crect x='2' y='2' width='16' height='12' rx='1.5' fill='white' fill-opacity='.7' stroke='%23151A3A' stroke-width='1.4' stroke-dasharray='2.4 1.8'/%3E%3Ctext x='18' y='26' font-family='Arial' font-weight='700' font-size='11' fill='%23151A3A'%3Et%3C/text%3E%3C/svg%3E") 2 2, text; }
+.mp.is-nevoa .mp-tela { cursor: cell; }
+/* Barra de ação da névoa (escolher → confirmar) */
+.mp-acao { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%); z-index: 5; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; width: max-content; max-width: calc(100% - 24px); padding: 8px 10px; border-radius: 14px; background: #fff; color: #151A3A; box-shadow: 0 10px 28px rgba(21, 26, 58, .3); border: 2px solid #E0455A; }
+.mp-acao[hidden] { display: none; }
+.mp-acao__txt { font-weight: 700; padding: 0 6px; }
+.mp-acao .btn { min-height: 34px; padding: 0 12px; font-size: .85rem; }
+.mp--sessao .mp-acao { bottom: 70px; gap: 6px; padding: 6px 8px; }
+/* Caixinha para escrever um texto ou etiqueta */
+.mp-escrever { position: absolute; z-index: 6; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px; border-radius: 12px; background: #fff; box-shadow: 0 10px 28px rgba(21, 26, 58, .3); border: 2px dashed #1D3FA8; width: 250px; }
+.mp-escrever input { flex: 1 1 100%; min-height: 40px; padding: 6px 10px; border: 1px solid rgba(21, 26, 58, .25); border-radius: 8px; font: inherit; color: #151A3A; background: #fff; }
+.mp-escrever input:focus-visible { outline: 3px solid #1D3FA8; outline-offset: 1px; }
+.mp-escrever__cont { margin-right: auto; color: #5A6380; font-variant-numeric: tabular-nums; }
+.mp-escrever .btn { min-height: 34px; padding: 0 12px; }
+/* Tela cheia: meio apagado no computador (aparece ao passar o mouse); no celular, sempre visível */
+.mp-cheia { position: absolute; right: 64px; bottom: 12px; z-index: 3; width: 36px; height: 36px; display: grid; place-items: center; padding: 6px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .55); color: #26304F; opacity: .45; cursor: pointer; transition: opacity .15s, background .15s; }
+.mp-cheia svg { width: 22px; height: 22px; }
+.mp-cheia:hover, .mp-cheia:focus-visible { opacity: 1; background: rgba(255, 255, 255, .95); }
+.mp-cheia:focus-visible { outline: 3px solid #1D3FA8; outline-offset: 2px; }
+.mp:not(.mp--sessao) .mp-cheia { right: 150px; bottom: 16px; }
+@media (pointer: coarse) { .mp-cheia { opacity: .9; } }
+.mp--sessao .mp-cheia { right: 14px; bottom: 120px; }   /* em cima do zoom (a barra do mestre ocupa o pé da caixa) */
+.mp:not(.mp--sessao) .mp-topo { right: auto; left: 14px; top: 190px; }   /* editor: abaixo da caixa da esquerda (o pergaminho fica à direita) */
+.mp:not(.mp--sessao) .mp-topo .mp-menu { right: auto; left: -6px; }

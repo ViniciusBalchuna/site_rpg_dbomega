@@ -1,0 +1,38 @@
+/* Criação de personagem: select de seção, progresso e cartões de sub-raça. Carregar depois de creation.css. */
+
+/* Select de seção (no topo) */
+.secao { display: grid; gap: 6px; margin: 0 0 18px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--gold); border-radius: 12px; box-shadow: 0 6px 24px rgba(4, 28, 66, .22); }
+.secao[hidden] { display: none; }
+.secao label { font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+.secao__sel { position: relative; }
+.secao__sel::after { content: ""; position: absolute; right: 16px; top: 50%; width: 9px; height: 9px; border-right: 2px solid var(--gold); border-bottom: 2px solid var(--gold); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.secao select { width: 100%; min-height: 48px; padding: 10px 40px 10px 14px; appearance: none; -webkit-appearance: none; background-color: rgba(255, 255, 255, .08); color: var(--text); font: inherit; font-size: 1.1rem; font-family: var(--serif); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.secao select:hover, .secao select:focus { border-color: var(--gold); }
+.secao select option { color: #0A2A52; background: #fff; }
+
+/* Barra de progresso: cada barra é uma seção (dourada = pronta) */
+.ceu .progress li { background: rgba(255, 255, 255, .28); }
+.ceu[data-theme="light"] .progress li { background: rgba(10, 74, 148, .22); }
+.ceu .progress li.is-done { background: linear-gradient(90deg, var(--grad-a), var(--grad-b)); }
+.ceu .progress li.is-current { background: #fff; box-shadow: 0 0 12px rgba(255, 255, 255, .8); }
+.ceu[data-theme="light"] .progress li.is-current { background: #0B4C94; box-shadow: 0 0 10px rgba(11, 76, 148, .5); }
+.ceu .progress li.is-current.is-done { background: linear-gradient(90deg, var(--grad-a), var(--grad-b)); box-shadow: 0 0 12px rgba(255, 224, 138, .9); }
+.progress__label { margin-bottom: 22px; }
+
+.summary dd.summary__falta, .summary dt.summary__falta { color: #FFB4A8; }
+.ceu[data-theme="light"] .summary dd.summary__falta, .ceu[data-theme="light"] .summary dt.summary__falta { color: #B3261E; }
+
+/* Informações da raça e da sub-raça */
+.raceinfo__text .raceinfo__nota { margin: 0; padding: 0; background: none; color: var(--muted); font-size: .85rem; font-style: italic; }
+.fatos { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 10px 0 0; }
+.fatos dt { margin: 0; font-family: var(--sans); font-size: .88rem; font-weight: 400; color: var(--muted); }
+.fatos dd { margin: 0; font-weight: 700; }
+.raceinfo__text .habsec { display: grid; gap: 8px; padding: 12px 14px; border-radius: 8px; background: rgba(127, 127, 127, .09); }
+.raceinfo__text .habsec h5 { margin: 0; }
+.habinfo { padding: 10px 12px; border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; background: rgba(127, 127, 127, .1); }
+.habinfo__top { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-bottom: 4px; }
+.habinfo__top strong { font-family: var(--serif); font-size: 1.02rem; }
+.habinfo__tag { padding: 1px 9px; border: 1px solid var(--gold); border-radius: 999px; color: var(--gold); font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.habinfo__tag--narrativa { border-color: var(--muted); color: var(--muted); }
+.habinfo__tag--hibrida { border-style: dashed; }
+.raceinfo__text .habinfo__txt { margin: 0; font-size: .93rem; white-space: pre-line; }

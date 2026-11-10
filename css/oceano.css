@@ -1,0 +1,150 @@
+/* =========================================================
+   Dragon Ball Omega — Campanha: azul monocromático
+   Mistura de elementos medievais (arcos góticos), religiosos (cruz no rosetão) e do oceano (ondas).
+   Use <html class="clash"> e carregue DEPOIS de clash.css e campanha.css.
+   Sumário: 1 Cores · 2 Fundo e decorações · 3 Caixas · 4 Omega · 5 Rodada do combate
+   Arquivo gerado a partir de um script: se for editar, mexa nos valores, não nos desenhos.
+   ========================================================= */
+
+/* 1. Cores (azul monocromático) --------------------------- */
+:root.clash {
+  --bg: #07172F;
+  --surface: rgba(7, 24, 52, .88);
+  --text: #EAF3FF;
+  --muted: rgba(234, 243, 255, .78);
+  --line: rgba(143, 188, 255, .34);
+  --pat: rgba(143, 188, 255, .07);
+  --header: rgba(5, 16, 36, .92);
+  --blue-1: #061428;
+  --blue-2: #0A2347;
+  --mix: #0D3466;
+  --red-1: #0F4C8A;
+  --red-2: #1666A8;
+  --frame: #8FBCFF;
+}
+:root.clash[data-theme="light"] {
+  --bg: #E6F0FB;
+  --surface: rgba(247, 251, 255, .9);
+  --text: #0B2347;
+  --muted: rgba(11, 35, 71, .78);
+  --line: rgba(20, 70, 140, .34);
+  --pat: rgba(20, 70, 140, .06);
+  --header: rgba(236, 245, 255, .95);
+  --blue-1: #D6E8FA;
+  --blue-2: #C3DCF5;
+  --mix: #AFD0F0;
+  --red-1: #98C2EA;
+  --red-2: #7FB0E0;
+  --frame: #2B63B5;
+}
+
+/* 2. Fundo e decorações ----------------------------------- */
+.clash::before {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='120' viewBox='0 0 96 120'%3E%3Cg fill='none' stroke='%238FBCFF' stroke-opacity='.11' stroke-width='1.2'%3E%3Cpath d='M0 120V56Q0 8 48 0Q96 8 96 56V120'/%3E%3Cpath d='M48 0V120'/%3E%3Ccircle cx='48' cy='54' r='14'/%3E%3Cpath d='M48 40v28M34 54h28'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 96px 120px,
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(120, 180, 255, .16), transparent 70%),
+    linear-gradient(180deg, var(--blue-1) 0%, var(--blue-2) 38%, var(--mix) 74%, var(--red-1) 100%);
+}
+.clash[data-theme="light"]::before {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='120' viewBox='0 0 96 120'%3E%3Cg fill='none' stroke='%232B63B5' stroke-opacity='.12' stroke-width='1.2'%3E%3Cpath d='M0 120V56Q0 8 48 0Q96 8 96 56V120'/%3E%3Cpath d='M48 0V120'/%3E%3Ccircle cx='48' cy='54' r='14'/%3E%3Cpath d='M48 40v28M34 54h28'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 96px 120px,
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255, 255, 255, .7), transparent 70%),
+    linear-gradient(180deg, var(--blue-1) 0%, var(--blue-2) 38%, var(--mix) 74%, var(--red-1) 100%);
+}
+.clash::after { /* ondas do oceano na base da tela */
+  content: "";
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 96px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='60' viewBox='0 0 400 60'%3E%3Cpath d='M0 60 L0 30.0 L10 32.8 L20 35.3 L30 37.3 L40 38.6 L50 39.0 L60 38.6 L70 37.3 L80 35.3 L90 32.8 L100 30.0 L110 27.2 L120 24.7 L130 22.7 L140 21.4 L150 21.0 L160 21.4 L170 22.7 L180 24.7 L190 27.2 L200 30.0 L210 32.8 L220 35.3 L230 37.3 L240 38.6 L250 39.0 L260 38.6 L270 37.3 L280 35.3 L290 32.8 L300 30.0 L310 27.2 L320 24.7 L330 22.7 L340 21.4 L350 21.0 L360 21.4 L370 22.7 L380 24.7 L390 27.2 L400 30.0 L400 60 Z' fill='%238FBCFF' fill-opacity='.16'/%3E%3C/svg%3E") 0 100% / 400px 60px repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='60' viewBox='0 0 400 60'%3E%3Cpath d='M0 60 L0 30.0 L10 33.2 L20 35.7 L30 36.9 L40 36.6 L50 34.9 L60 32.1 L70 28.8 L80 25.8 L90 23.7 L100 23.0 L110 23.8 L120 26.0 L130 29.0 L140 32.3 L150 35.0 L160 36.7 L170 36.9 L180 35.6 L190 33.0 L200 29.8 L210 26.7 L220 24.2 L230 23.1 L240 23.4 L250 25.2 L260 28.0 L270 31.3 L280 34.3 L290 36.3 L300 37.0 L310 36.1 L320 33.9 L330 30.8 L340 27.6 L350 24.8 L360 23.3 L370 23.1 L380 24.5 L390 27.1 L400 30.3 L400 60 Z' fill='%235C9BE8' fill-opacity='.20'/%3E%3C/svg%3E") 120px 100% / 400px 60px repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='60' viewBox='0 0 400 60'%3E%3Cpath d='M0 60 L0 30.0 L10 32.9 L20 34.8 L30 34.8 L40 32.9 L50 30.0 L60 27.1 L70 25.2 L80 25.2 L90 27.1 L100 30.0 L110 32.9 L120 34.8 L130 34.8 L140 32.9 L150 30.0 L160 27.1 L170 25.2 L180 25.2 L190 27.1 L200 30.0 L210 32.9 L220 34.8 L230 34.8 L240 32.9 L250 30.0 L260 27.1 L270 25.2 L280 25.2 L290 27.1 L300 30.0 L310 32.9 L320 34.8 L330 34.8 L340 32.9 L350 30.0 L360 27.1 L370 25.2 L380 25.2 L390 27.1 L400 30.0 L400 60 Z' fill='%232B6CB8' fill-opacity='.30'/%3E%3C/svg%3E") 60px 100% / 400px 60px repeat-x;
+  animation: ondas 48s linear infinite;
+}
+.clash[data-theme="light"]::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='60' viewBox='0 0 400 60'%3E%3Cpath d='M0 60 L0 30.0 L10 32.8 L20 35.3 L30 37.3 L40 38.6 L50 39.0 L60 38.6 L70 37.3 L80 35.3 L90 32.8 L100 30.0 L110 27.2 L120 24.7 L130 22.7 L140 21.4 L150 21.0 L160 21.4 L170 22.7 L180 24.7 L190 27.2 L200 30.0 L210 32.8 L220 35.3 L230 37.3 L240 38.6 L250 39.0 L260 38.6 L270 37.3 L280 35.3 L290 32.8 L300 30.0 L310 27.2 L320 24.7 L330 22.7 L340 21.4 L350 21.0 L360 21.4 L370 22.7 L380 24.7 L390 27.2 L400 30.0 L400 60 Z' fill='%232B63B5' fill-opacity='.16'/%3E%3C/svg%3E") 0 100% / 400px 60px repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='60' viewBox='0 0 400 60'%3E%3Cpath d='M0 60 L0 30.0 L10 33.2 L20 35.7 L30 36.9 L40 36.6 L50 34.9 L60 32.1 L70 28.8 L80 25.8 L90 23.7 L100 23.0 L110 23.8 L120 26.0 L130 29.0 L140 32.3 L150 35.0 L160 36.7 L170 36.9 L180 35.6 L190 33.0 L200 29.8 L210 26.7 L220 24.2 L230 23.1 L240 23.4 L250 25.2 L260 28.0 L270 31.3 L280 34.3 L290 36.3 L300 37.0 L310 36.1 L320 33.9 L330 30.8 L340 27.6 L350 24.8 L360 23.3 L370 23.1 L380 24.5 L390 27.1 L400 30.3 L400 60 Z' fill='%231F57A8' fill-opacity='.18'/%3E%3C/svg%3E") 120px 100% / 400px 60px repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='60' viewBox='0 0 400 60'%3E%3Cpath d='M0 60 L0 30.0 L10 32.9 L20 34.8 L30 34.8 L40 32.9 L50 30.0 L60 27.1 L70 25.2 L80 25.2 L90 27.1 L100 30.0 L110 32.9 L120 34.8 L130 34.8 L140 32.9 L150 30.0 L160 27.1 L170 25.2 L180 25.2 L190 27.1 L200 30.0 L210 32.9 L220 34.8 L230 34.8 L240 32.9 L250 30.0 L260 27.1 L270 25.2 L280 25.2 L290 27.1 L300 30.0 L310 32.9 L320 34.8 L330 34.8 L340 32.9 L350 30.0 L360 27.1 L370 25.2 L380 25.2 L390 27.1 L400 30.0 L400 60 Z' fill='%231A4A92' fill-opacity='.26'/%3E%3C/svg%3E") 60px 100% / 400px 60px repeat-x;
+}
+@keyframes ondas { to { background-position: 400px 100%, -280px 100%, 460px 100%; } }
+@media (prefers-reduced-motion: reduce) { .clash::after { animation: none; } }
+.no-motion.clash::after { animation: none; }
+
+/* 3. Caixas: moldura dupla com cantos ornamentados (estilo vitral) ---- */
+.clash .panel-box,
+.clash .sec-card,
+.clash .player,
+.clash .hero-box {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg transform='translate(0 0) scale(1 1)' fill='none' stroke='%238FBCFF' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 22V9Q2 2 9 2H22'/%3E%3Ccircle cx='9.5' cy='9.5' r='2.2' fill='%238FBCFF' fill-opacity='.35'/%3E%3C/g%3E%3C/svg%3E") top left / 24px 24px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg transform='translate(24 0) scale(-1 1)' fill='none' stroke='%238FBCFF' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 22V9Q2 2 9 2H22'/%3E%3Ccircle cx='9.5' cy='9.5' r='2.2' fill='%238FBCFF' fill-opacity='.35'/%3E%3C/g%3E%3C/svg%3E") top right / 24px 24px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg transform='translate(0 24) scale(1 -1)' fill='none' stroke='%238FBCFF' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 22V9Q2 2 9 2H22'/%3E%3Ccircle cx='9.5' cy='9.5' r='2.2' fill='%238FBCFF' fill-opacity='.35'/%3E%3C/g%3E%3C/svg%3E") bottom left / 24px 24px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg transform='translate(24 24) scale(-1 -1)' fill='none' stroke='%238FBCFF' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 22V9Q2 2 9 2H22'/%3E%3Ccircle cx='9.5' cy='9.5' r='2.2' fill='%238FBCFF' fill-opacity='.35'/%3E%3C/g%3E%3C/svg%3E") bottom right / 24px 24px no-repeat, var(--surface);
+  box-shadow: inset 0 0 0 4px rgba(7, 24, 52, .0), inset 0 0 0 5px var(--line), 0 14px 40px rgba(2, 8, 22, .35);
+}
+.clash[data-theme="light"] .panel-box,
+.clash[data-theme="light"] .sec-card,
+.clash[data-theme="light"] .player,
+.clash[data-theme="light"] .hero-box {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg transform='translate(0 0) scale(1 1)' fill='none' stroke='%232B63B5' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 22V9Q2 2 9 2H22'/%3E%3Ccircle cx='9.5' cy='9.5' r='2.2' fill='%232B63B5' fill-opacity='.35'/%3E%3C/g%3E%3C/svg%3E") top left / 24px 24px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg transform='translate(24 0) scale(-1 1)' fill='none' stroke='%232B63B5' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 22V9Q2 2 9 2H22'/%3E%3Ccircle cx='9.5' cy='9.5' r='2.2' fill='%232B63B5' fill-opacity='.35'/%3E%3C/g%3E%3C/svg%3E") top right / 24px 24px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg transform='translate(0 24) scale(1 -1)' fill='none' stroke='%232B63B5' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 22V9Q2 2 9 2H22'/%3E%3Ccircle cx='9.5' cy='9.5' r='2.2' fill='%232B63B5' fill-opacity='.35'/%3E%3C/g%3E%3C/svg%3E") bottom left / 24px 24px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg transform='translate(24 24) scale(-1 -1)' fill='none' stroke='%232B63B5' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 22V9Q2 2 9 2H22'/%3E%3Ccircle cx='9.5' cy='9.5' r='2.2' fill='%232B63B5' fill-opacity='.35'/%3E%3C/g%3E%3C/svg%3E") bottom right / 24px 24px no-repeat, var(--surface);
+  box-shadow: inset 0 0 0 5px var(--line), 0 12px 32px rgba(20, 60, 120, .16);
+}
+.clash .hero-box { padding: clamp(28px, 5vw, 54px); }
+.clash .sec-card::before { height: 3px; background: linear-gradient(90deg, transparent, var(--frame), transparent); }
+.clash .sec-card:hover, .clash a.player:hover { border-color: var(--frame); }
+.clash a.player { border-color: var(--frame); }
+.clash .sec-card h2 { color: var(--frame); }
+.clash .hero-box h1 { letter-spacing: .01em; }
+
+/* 4. O Omega mantém o degradê azul, violeta e vermelho ---- */
+.clash .omega {
+  background: linear-gradient(180deg, #5B8CFF 0%, #8A5CF5 50%, #E0455A 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 14px rgba(120, 140, 255, .35));
+}
+
+/* 5. Combate: a caixa da rodada no estilo aquático -------- */
+.clash .round {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--frame); border-radius: 4px;
+  background: linear-gradient(180deg, rgba(143, 188, 255, .10), transparent 55%), var(--surface);
+  box-shadow: inset 0 0 0 5px var(--line), 0 14px 40px rgba(2, 8, 22, .35);
+}
+.clash[data-theme="light"] .round { box-shadow: inset 0 0 0 5px var(--line), 0 12px 32px rgba(20, 60, 120, .16); background: linear-gradient(180deg, rgba(43, 99, 181, .10), transparent 55%), var(--surface); }
+.clash .round::before, .clash .round::after { /* duas camadas de onda na base, andando em sentidos opostos */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='28' viewBox='0 0 160 28'%3E%3Cpath d='M0 14Q20 2 40 14T80 14T120 14T160 14V28H0Z' fill='%238FBCFF' fill-opacity='.16'/%3E%3C/svg%3E") 0 100% / 160px 28px repeat-x;
+  animation: ondas-round 9s linear infinite;
+}
+.clash .round::after { height: 22px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='28' viewBox='0 0 160 28'%3E%3Cpath d='M0 14Q20 2 40 14T80 14T120 14T160 14V28H0Z' fill='%238FBCFF' fill-opacity='.12'/%3E%3C/svg%3E"); background-size: 120px 22px; animation-duration: 6s; animation-direction: reverse; }
+.clash[data-theme="light"] .round::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='28' viewBox='0 0 160 28'%3E%3Cpath d='M0 14Q20 2 40 14T80 14T120 14T160 14V28H0Z' fill='%232B63B5' fill-opacity='.18'/%3E%3C/svg%3E"); }
+.clash[data-theme="light"] .round::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='28' viewBox='0 0 160 28'%3E%3Cpath d='M0 14Q20 2 40 14T80 14T120 14T160 14V28H0Z' fill='%232B63B5' fill-opacity='.13'/%3E%3C/svg%3E"); }
+@keyframes ondas-round { to { background-position-x: 160px; } }
+@media (prefers-reduced-motion: reduce) { .clash .round::before, .clash .round::after { animation: none; } }
+.no-motion.clash .round::before, .no-motion.clash .round::after { animation: none; }
+.clash .round > * { position: relative; z-index: 1; }
+.clash .round__label { color: var(--frame); }
+.clash .round__num {
+  background: linear-gradient(180deg, #EAF3FF 0%, #8FBCFF 55%, #2F7BD6 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 14px rgba(120, 180, 255, .35));
+}
+.clash[data-theme="light"] .round__num { background: linear-gradient(180deg, #5A9BE6 0%, #2B63B5 55%, #0B2347 100%); -webkit-background-clip: text; background-clip: text; }
+.clash .round__actions { padding-bottom: 14px; }
+.clash .round .btn:not(.btn--ghost) { background: linear-gradient(135deg, #8FBCFF, #2F7BD6); color: #04132B; border-color: transparent; }
+.clash .round .btn--ghost, .clash .round .btn.btn--ghost { border-color: var(--frame); color: var(--text); }
+.clash[data-theme="light"] .round .btn:not(.btn--ghost) { background: linear-gradient(135deg, #5A9BE6, #2B63B5); color: #fff; }
+
+/* Ao chegar na Campanha, o véu da transição cobre a janela inteira e some em fade.
+   Sem isto, a regra das ondas (.clash::after, só 96px de altura) fazia o véu virar um bloco azul no topo. */
+html.clash.wipe-in::after,
+html.clash[data-theme="light"].wipe-in::after {
+  top: 0; right: 0; bottom: 0; left: 0;
+  height: auto;
+  z-index: 9999;
+  background: var(--wipe-bg);
+  animation: wipe-out 1.1s .15s ease-in-out forwards;
+}

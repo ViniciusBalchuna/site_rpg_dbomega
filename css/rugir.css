@@ -1,0 +1,97 @@
+/* =========================================================
+   Dragon Ball Omega — Rugir do Dragão
+   Técnica de classe especial (automática no nível 20): sempre em cima das outras, com moldura dourada ornamentada.
+   Cores fixas, iguais em todo modelo de ficha e tema (não usa as variáveis do tema).
+   Usado na ficha (personagem.html), no modo debug e no combate da campanha.
+   No fim do arquivo: as faixas coloridas das habilidades de classe.
+   ========================================================= */
+:root .techs .tech.tech--dragao {
+  --rg-ouro: #F2C14E; --rg-ouro-claro: #FFE7A3; --rg-ouro-escuro: #9A6A12; --rg-tinta: #F6E7BE; --rg-fundo: #160C03;
+  position: relative; isolation: isolate; overflow: hidden; margin-bottom: 6px; padding: 24px 30px 26px;
+  color: var(--rg-tinta); border: 1px solid var(--rg-ouro); border-radius: 6px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg transform='rotate%280 24 24%29' fill='none' stroke='%23F2C14E' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 45V11a8 8 0 0 1 8-8h34' stroke-width='1.6'/%3E%3Cpath d='M8 40V15a7 7 0 0 1 7-7h25' stroke-width='1' opacity='.7'/%3E%3Cpath d='M3 26c6 0 9-3 9-8s-3-6-5-6' stroke-width='1.3'/%3E%3Cpath d='M26 3c0 6-3 9-8 9s-6-3-6-5' stroke-width='1.3'/%3E%3Cpath d='M15 15l5 5' stroke-width='1.3'/%3E%3Ccircle cx='22.5' cy='22.5' r='2.6' fill='%23F2C14E' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23F2C14E' stroke='none'/%3E%3C/g%3E%3C/svg%3E") left 4px top 4px / 44px 44px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg transform='rotate%2890 24 24%29' fill='none' stroke='%23F2C14E' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 45V11a8 8 0 0 1 8-8h34' stroke-width='1.6'/%3E%3Cpath d='M8 40V15a7 7 0 0 1 7-7h25' stroke-width='1' opacity='.7'/%3E%3Cpath d='M3 26c6 0 9-3 9-8s-3-6-5-6' stroke-width='1.3'/%3E%3Cpath d='M26 3c0 6-3 9-8 9s-6-3-6-5' stroke-width='1.3'/%3E%3Cpath d='M15 15l5 5' stroke-width='1.3'/%3E%3Ccircle cx='22.5' cy='22.5' r='2.6' fill='%23F2C14E' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23F2C14E' stroke='none'/%3E%3C/g%3E%3C/svg%3E") right 4px top 4px / 44px 44px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg transform='rotate%28180 24 24%29' fill='none' stroke='%23F2C14E' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 45V11a8 8 0 0 1 8-8h34' stroke-width='1.6'/%3E%3Cpath d='M8 40V15a7 7 0 0 1 7-7h25' stroke-width='1' opacity='.7'/%3E%3Cpath d='M3 26c6 0 9-3 9-8s-3-6-5-6' stroke-width='1.3'/%3E%3Cpath d='M26 3c0 6-3 9-8 9s-6-3-6-5' stroke-width='1.3'/%3E%3Cpath d='M15 15l5 5' stroke-width='1.3'/%3E%3Ccircle cx='22.5' cy='22.5' r='2.6' fill='%23F2C14E' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23F2C14E' stroke='none'/%3E%3C/g%3E%3C/svg%3E") right 4px bottom 4px / 44px 44px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg transform='rotate%28270 24 24%29' fill='none' stroke='%23F2C14E' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 45V11a8 8 0 0 1 8-8h34' stroke-width='1.6'/%3E%3Cpath d='M8 40V15a7 7 0 0 1 7-7h25' stroke-width='1' opacity='.7'/%3E%3Cpath d='M3 26c6 0 9-3 9-8s-3-6-5-6' stroke-width='1.3'/%3E%3Cpath d='M26 3c0 6-3 9-8 9s-6-3-6-5' stroke-width='1.3'/%3E%3Cpath d='M15 15l5 5' stroke-width='1.3'/%3E%3Ccircle cx='22.5' cy='22.5' r='2.6' fill='%23F2C14E' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23F2C14E' stroke='none'/%3E%3C/g%3E%3C/svg%3E") left 4px bottom 4px / 44px 44px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cg fill='none' stroke='%23F2C14E' stroke-linecap='round'%3E%3Cpath d='M2 10h38M80 10h38' stroke-width='1'/%3E%3Cpath d='M40 10c6 0 8-6 14-6M80 10c-6 0-8-6-14-6' stroke-width='1.3'/%3E%3Cpath d='M40 10c6 0 8 6 14 6M80 10c-6 0-8 6-14 6' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M60 2l7 8-7 8-7-8z' fill='%23F2C14E'/%3E%3Cpath d='M60 6l3.5 4-3.5 4-3.5-4z' fill='%231A0F04'/%3E%3C/svg%3E") center top 3px / 132px 22px no-repeat,
+    radial-gradient(120% 90% at 50% 0%, rgba(242, 193, 78, .22), transparent 60%),
+    repeating-radial-gradient(circle at 0 100%, transparent 0 9px, rgba(242, 193, 78, .05) 9px 10px),
+    linear-gradient(160deg, #2B1806 0%, var(--rg-fundo) 55%, #241304 100%);
+  box-shadow: 0 0 0 1px #3A2306, 0 0 0 4px rgba(242, 193, 78, .14), 0 0 22px rgba(242, 193, 78, .28), inset 0 0 26px rgba(0, 0, 0, .55);
+}
+/* moldura interna fina */
+:root .techs .tech.tech--dragao::before {
+  content: ""; position: absolute; inset: 9px; z-index: -1; pointer-events: none;
+  border: 1px solid rgba(242, 193, 78, .45); border-radius: 3px;
+}
+/* ideograma do dragão, discreto, no canto */
+:root .techs .tech.tech--dragao::after {
+  content: "龍"; position: absolute; right: 22px; bottom: -14px; z-index: -1; pointer-events: none;
+  font-family: "Shippori Mincho", serif; font-size: 6.5rem; font-weight: 800; line-height: 1; color: rgba(242, 193, 78, .08);
+}
+:root .techs .tech.tech--dragao .tech__name strong {
+  font-family: "Shippori Mincho", var(--serif, serif); font-size: 1.25rem; letter-spacing: .03em; color: var(--rg-ouro-claro);
+  background: linear-gradient(100deg, #C98E1C 0%, #FFE7A3 30%, #FFF6D8 45%, #F2C14E 60%, #C98E1C 100%) 0 0 / 220% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: rugir-brilho 5s ease-in-out infinite;
+}
+@keyframes rugir-brilho { 0%, 40% { background-position: 100% 0; } 100% { background-position: -120% 0; } }
+:root .techs .tech.tech--dragao .tech__name small { color: rgba(246, 231, 190, .72); letter-spacing: .04em; }
+:root .techs .tech.tech--dragao .tech__name:hover strong { filter: brightness(1.15); }
+:root .techs .tech.tech--dragao .tech__name:focus-visible { outline: 2px solid var(--rg-ouro); outline-offset: 3px; }
+/* separador: linha dourada com losango no meio */
+:root .techs .tech.tech--dragao .tech__details {
+  position: relative; margin-top: 16px; padding-top: 16px; border-top: 0;
+  background: linear-gradient(90deg, transparent, var(--rg-ouro) 20%, var(--rg-ouro) 80%, transparent) top / 100% 1px no-repeat;
+}
+:root .techs .tech.tech--dragao .tech__details::before {
+  content: ""; position: absolute; top: -4px; left: 50%; width: 8px; height: 8px; margin-left: -4px;
+  background: var(--rg-ouro); transform: rotate(45deg); box-shadow: 0 0 0 3px var(--rg-fundo);
+}
+:root .techs .tech.tech--dragao .tech__details dt { color: var(--rg-ouro); font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; }
+:root .techs .tech.tech--dragao .tech__details dd { color: var(--rg-tinta); }
+:root .techs .tech.tech--dragao .tech__top { align-items: flex-start; }
+/* custo em PD: selo pequeno, com losango, no mesmo traço da moldura */
+:root .techs .tech.tech--dragao .tag {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px 0 9px;
+  color: var(--rg-ouro-claro); background: rgba(242, 193, 78, .06); border: 1px solid rgba(242, 193, 78, .7); border-radius: 3px;
+  box-shadow: inset 0 0 0 2px var(--rg-fundo), inset 0 0 0 3px rgba(242, 193, 78, .28);
+  font-family: "Shippori Mincho", var(--serif, serif); font-size: .82rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+}
+:root .techs .tech.tech--dragao .tag::before { content: ""; width: 6px; height: 6px; background: var(--rg-ouro); transform: rotate(45deg); flex: none; }
+/* Usar: placa escura com moldura dupla dourada (como o cartão), sem brilho de plástico */
+:root .techs .tech.tech--dragao .use-btn--pd {
+  min-height: 34px; padding: 0 18px; color: var(--rg-ouro-claro);
+  background: linear-gradient(180deg, rgba(242, 193, 78, .16), rgba(242, 193, 78, .04)), var(--rg-fundo);
+  border: 1px solid var(--rg-ouro); border-radius: 3px;
+  box-shadow: inset 0 0 0 2px var(--rg-fundo), inset 0 0 0 3px rgba(242, 193, 78, .4);
+  font-family: "Shippori Mincho", var(--serif, serif); font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  transition: background-color .2s, color .2s, box-shadow .2s;
+}
+:root .techs .tech.tech--dragao .use-btn--pd:hover {
+  transform: none; color: #2A1703;
+  background: linear-gradient(180deg, #FFE7A3, #E0A93A 60%, #B07A18);
+  box-shadow: inset 0 0 0 2px #FFE7A3, inset 0 0 0 3px rgba(90, 58, 8, .5), 0 0 16px rgba(242, 193, 78, .35);
+}
+:root .techs .tech.tech--dragao .use-btn--pd:active { transform: scale(.97); }
+:root .techs .tech.tech--dragao .use-btn--pd:focus-visible { outline: 2px solid var(--rg-ouro-claro); outline-offset: 3px; }
+:root .techs .tech.tech--dragao .die { color: var(--rg-ouro); border-color: rgba(242, 193, 78, .6); background: transparent; }
+@media (max-width: 520px) { :root .techs .tech.tech--dragao { padding: 20px 18px 18px; } }
+@media (prefers-reduced-motion: reduce) { :root .techs .tech.tech--dragao .tech__name strong { animation: none; background-position: 30% 0; } }
+.no-motion .techs .tech.tech--dragao .tech__name strong { animation: none; background-position: 30% 0; }
+
+/* =========================================================
+   Faixa colorida à esquerda das habilidades de classe (leitura rápida)
+   Genérica: cinza · Sub-classe: roxa · Guerreiro: vermelha · Monge: azul · Suporte: verde · Artífice: marrom
+   ========================================================= */
+.techs .tech.tech--faixa { position: relative; overflow: hidden; padding-left: 22px;
+  background-image: linear-gradient(90deg, color-mix(in srgb, var(--faixa) 14%, transparent), transparent 46%); }
+.techs .tech.tech--faixa::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--faixa);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, .12), 2px 0 10px color-mix(in srgb, var(--faixa) 45%, transparent); }
+.tech--faixa-generica  { --faixa: #8D939C; }
+.tech--faixa-sub       { --faixa: #9B5DE5; }
+.tech--faixa-guerreiro { --faixa: #D9473A; }
+.tech--faixa-monge     { --faixa: #3B82F6; }
+.tech--faixa-suporte   { --faixa: #2FA866; }
+.tech--faixa-artifice  { --faixa: #9A6B3F; }

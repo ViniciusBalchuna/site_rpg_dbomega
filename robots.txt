@@ -1,0 +1,9 @@
+# Fase de teste: nenhum buscador deve indexar o site.
+# Exceção: o Claude (Claude-User) pode abrir as páginas quando a pessoa pede para ele conferir o site.
+# O noindex (meta tag e cabeçalho X-Robots-Tag) continua valendo, então nada disso entra no Google.
+# Ao lançar de verdade, troque "Disallow: /" por "Disallow:" (vazio) ou apague este arquivo.
+User-agent: Claude-User
+Allow: /
+
+User-agent: *
+Disallow: /

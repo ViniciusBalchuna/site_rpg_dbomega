@@ -1,0 +1,21 @@
+# Configuração de cada ambiente (tem a chave do Supabase). O modelo é js/supabase-config.example.js.
+js/supabase-config.js
+
+# Dados do modo debug, gravados pelo ferramentas/servidor-debug.js no seu computador
+ferramentas/debug-local/
+
+# Pacotes de atualização e arquivos de rascunho
+*.zip
+
+# Segredos e configurações locais
+.env
+.env.*
+
+# Editor e sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Dependências (caso algum dia use npm)
+node_modules/

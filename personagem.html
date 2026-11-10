@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="ki">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow"> <!-- fase de teste: apague ao lançar -->
+  <title>Personagem | Dragon Ball Omega</title>
+  <link rel="icon" href="imagem/favicon/favicon_personagem.ico?v=2" type="image/x-icon" sizes="16x16 32x32 48x48 64x64">
+  <link rel="icon" href="imagem/favicon/favicon_personagem.png?v=2" type="image/png" sizes="64x64">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/ki-theme.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/cropper.css">
+  <link rel="stylesheet" href="css/sheet.css?v=30">
+  <link rel="stylesheet" href="css/tamanho.css">
+  <link rel="stylesheet" href="css/fichas.css">
+  <link rel="stylesheet" href="css/prato.css?v=33">
+  <link rel="stylesheet" href="css/efeitos.css">
+  <link rel="stylesheet" href="css/rugir.css">
+  <script src="js/theme.js"></script>
+  <script src="js/ficha-cedo.js"></script>
+  <script src="js/transition.js"></script>
+  <script src="js/carregando.js" defer></script>
+</head>
+<body>
+
+  <!-- Nuvens nimbus decorativas -->
+  <div class="nimbus" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+
+  <div id="sheet-loading" class="loading" role="status" aria-live="polite">
+    <div class="nimbus" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="loading__msg">Aguarde alguns instantes...</p>
+  </div>
+
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="index.html">Dragon Ball Omega</a>
+      <nav aria-label="Principal">
+        <ul class="nav">
+          <li><a href="personagens.html" aria-current="page">Personagens</a></li>
+          <li><a href="enciclopedia.html">Enciclopédia</a></li>
+          <li><a href="campanha.html">Campanha</a></li>
+        </ul>
+      </nav>
+      <a class="icon-btn" href="configuracoes.html" aria-label="Configurações" title="Configurações">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="wrap wrap--wide">
+      <!-- Tela de carregamento: some quando a ficha termina de carregar (js/sheet.js) -->
+      <a class="back" href="personagens.html">Voltar para Personagens</a>
+
+      <section id="not-found" class="panel notfound" hidden>
+        <h1>Personagem não encontrado</h1>
+        <p>Esse personagem não existe ou pertence a outra conta. Confere se você está conectado na conta certa.</p>
+        <p id="not-found-why" class="msg msg--error" hidden></p>
+        <a class="btn" href="personagens.html">Ver meus personagens</a>
+      </section>
+
+      <p id="view-banner" class="view-banner" role="status" hidden>Visão do mestre: você está só olhando esta ficha. Nada aqui pode ser alterado.</p>
+      <!-- Cabeçalho em largura total (só no modo de visualização "artefato"; montado por js/sheet.js) -->
+      <div id="sheet-head" class="col sheet-left sheet-head" hidden></div>
+      <div id="sheet-grid" class="sheet-grid">
+        <!-- Esquerda: montada por js/sheet.js -->
+        <div id="sheet-left" class="col sheet-left"></div>
+
+        <!-- Direita -->
+        <div id="sheet-right" class="col">
+          <!-- Modo de visualização "Navegação": abas e peças extras (montadas por js/sheet.js e js/arsenal.js). data-tab diz em qual aba cada caixa aparece. -->
+          <div id="nav-tabs" class="navtabs" role="tablist" aria-label="Seções da ficha" hidden></div>
+          <div id="nav-info" class="col sheet-left" data-tab="descricao" role="tabpanel" aria-label="Descrição" hidden></div>
+
+          <section class="panel" data-tab="golpes">
+            <h2>Multiplicadores de dano</h2>
+            <div id="mult" class="mult"></div>
+            <p class="note">Clique em um multiplicador para aplicá-lo na rolagem.</p>
+          </section>
+
+          <section id="nav-golpes" class="panel" data-tab="golpes" hidden>
+            <h2>Habilidades com dano</h2>
+            <p class="note note--top">Clique no dado para rolar o d20. Depois, role o dano.</p>
+            <ul id="nav-golpes-list" class="techs"></ul>
+            <p id="nav-golpes-empty" class="empty">Nenhuma habilidade com dano ainda.</p>
+          </section>
+
+          <section class="panel panel--zeni" data-tab="inventario">
+            <div class="panel__head">
+              <h2>Zenis</h2>
+              <button id="zeni-edit" class="add" type="button" aria-label="Alterar Zenis">+</button>
+            </div>
+            <p class="zeni"><b id="zeni-value">0</b> <span>Z</span></p>
+            <p class="note">O dinheiro deste mundo. Todo personagem começa com 2.000.</p>
+          </section>
+
+          <section class="panel" data-tab="inventario">
+            <div class="panel__head">
+              <h2>Equipamentos</h2>
+              <p id="inv-badge" class="badge" title="Equipamentos carregados e limite do inventário"></p>
+            </div>
+            <ul id="item-list" class="items"></ul>
+            <p id="item-empty" class="empty">Nenhum equipamento ainda.</p>
+            <button id="item-add" class="add-row" type="button" aria-label="Adicionar equipamento">+</button>
+          </section>
+
+          <!-- As técnicas ficam em duas janelas; clicar no nome de cada uma recolhe e abre (js/arsenal.js, data-fold) -->
+          <section class="panel panel--fold" id="tech-class-panel" data-tab="tecnicas">
+            <div class="panel__head">
+              <button class="fold" type="button" data-fold="tech-class-body" aria-expanded="true" aria-controls="tech-class-body"><h2>Técnicas de Classe</h2><span class="fold__chev" aria-hidden="true"></span></button>
+              <p id="tech-class-count" class="badge" title="Espaços ocupados / espaços (2 no começo, +1 a cada 15 níveis, +1 no nível 200)"></p>
+            </div>
+            <div id="tech-class-body">
+              <p id="tech-pending" class="pending" role="status" hidden></p>
+              <ul id="tech-class-list" class="techs"></ul>
+              <button id="tech-class-add" class="add-row" type="button" aria-label="Aprender habilidade de classe">+</button>
+              <!-- Habilidades da raça: não ocupam espaço; o título recolhe (js/arsenal.js, renderRaca) -->
+              <div id="race-section" class="race-section" hidden>
+                <button id="race-fold" class="fold race-fold" type="button" aria-expanded="true" aria-controls="race-list"><h3>Habilidades de Raça</h3><span class="fold__chev" aria-hidden="true"></span></button>
+                <ul id="race-list" class="techs"></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel panel--fold" data-tab="tecnicas">
+            <div class="panel__head">
+              <button class="fold" type="button" data-fold="tech-body" aria-expanded="true" aria-controls="tech-body"><h2>Técnicas Aprendidas</h2><span class="fold__chev" aria-hidden="true"></span></button>
+              <p id="rd-badge" class="badge" title="Resistência a dano de técnica"></p>
+            </div>
+            <div id="tech-body">
+              <div class="tech-bar">
+                <p id="tech-limit" class="badge" title="Técnicas aprendidas / limite (5 + modificador de Mente). O Soco não conta."></p>
+                <button id="tech-inv-btn" class="btn btn--ghost tech-inv-btn" type="button">Inventário de técnicas <span id="tech-inv-count" class="count"></span></button>
+              </div>
+              <p class="note note--top">Clique no dado para rolar o d20. Depois, role o dano.</p>
+              <ul id="tech-list" class="techs"></ul>
+              <button id="tech-add" class="add-row" type="button" aria-label="Criar nova técnica">+</button>
+            </div>
+          </section>
+
+          <section class="panel" data-tab="descricao">
+            <div class="panel__head">
+              <h2>Transformações</h2>
+              <p id="tf-badge" class="badge" title="Transformação ativa"></p>
+            </div>
+            <ul id="tf-list" class="items"></ul>
+            <p id="tf-empty" class="empty">Nenhuma transformação aprendida ainda.</p>
+            <button id="tf-learn" class="btn btn--block" type="button">Aprender transformação</button>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">&copy; Dragon Ball Omega</div>
+  </footer>
+
+  <!-- Janela do botão + de um campo (montada por js/sheet.js) -->
+  <dialog id="field-dialog" class="modal" aria-label="Alterar campo"></dialog>
+
+  <!-- Trocar de classe: avisa que as habilidades de classe se perdem (js/sheet.js) -->
+  <dialog id="class-confirm-dialog" class="modal" aria-labelledby="class-confirm-title">
+    <div>
+      <h2 id="class-confirm-title">Trocar de classe?</h2>
+      <p class="note">Mudar de classe faz você <strong>perder todas as suas habilidades de classe</strong>: <strong id="class-confirm-lost"></strong>. Você ganha a habilidade inicial da nova classe (<strong id="class-confirm-new"></strong>), mas a maestria das antigas se vai junto.</p>
+      <div class="modal__actions">
+        <button id="class-confirm-no" class="btn btn--ghost" type="button">Cancelar</button>
+        <button id="class-confirm-yes" class="btn btn--danger" type="button">Trocar de classe</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Treino (ganhar TP) -->
+  <dialog id="train-dialog" class="modal" aria-labelledby="train-title">
+    <form id="train-form" novalidate>
+      <button class="modal__close" type="button" data-close aria-label="Fechar">×</button>
+      <h2 id="train-title">Treino</h2>
+      <p class="modal__lead">A forma oficial de ganhar TP. Escolhe o treino e a gravidade do local.</p>
+      <div class="field">
+        <label for="tr-tipo">Tipo do treino</label>
+        <select id="tr-tipo"></select>
+      </div>
+      <div class="field">
+        <label for="tr-grav">Gravidade</label>
+        <select id="tr-grav"></select>
+      </div>
+      <p id="tr-preview" class="modal__preview"></p>
+      <p id="tr-msg" class="msg" role="status" aria-live="polite"></p>
+      <div class="modal__actions">
+        <button id="tr-submit" class="btn" type="submit">Treinar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Novo equipamento -->
+
+  <dialog id="item-dialog" class="modal modal--wide" aria-labelledby="item-title">
+    <form id="item-form" novalidate>
+      <button class="modal__close" type="button" data-close aria-label="Fechar sem salvar">×</button>
+      <h2 id="item-title">Novo equipamento</h2>
+      <div class="field">
+        <label for="it-nome">Nome</label>
+        <input id="it-nome" type="text" maxlength="60" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="it-desc">Descrição</label>
+        <textarea id="it-desc" maxlength="500" rows="3"></textarea>
+      </div>
+      <label class="check">
+        <input id="it-has-ability" type="checkbox">
+        <span>Criar uma habilidade para este equipamento</span>
+      </label>
+      <div id="item-ability" hidden></div>
+      <div id="it-gastar-wrap" hidden>
+        <label class="check">
+          <input id="it-gastar" type="checkbox" checked>
+          <span>Gastar TP?</span>
+        </label>
+        <p class="hint">Marcado: a habilidade custa TP como uma técnica aprendida. Desmarque só se o equipamento foi entregue ao jogador.</p>
+        <div id="item-cost"></div>
+      </div>
+      <p id="item-msg" class="msg" role="alert"></p>
+      <div class="modal__actions">
+        <button id="item-cancel" class="btn btn--ghost" type="button">Cancelar</button>
+        <button id="item-submit" class="btn" type="submit">Adicionar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Nova técnica -->
+  <dialog id="tech-dialog" class="modal modal--wide" aria-labelledby="tech-title">
+    <form id="tech-form" novalidate>
+      <button class="modal__close" type="button" data-close aria-label="Fechar sem salvar">×</button>
+      <h2 id="tech-title">Nova técnica</h2>
+      <div id="tech-fields"></div>
+      <label class="check">
+        <input id="tech-gastar" type="checkbox" checked>
+        <span>Gastar TP?</span>
+      </label>
+      <p class="hint">Marcado: a técnica custa TP para ser aprendida. Ao editar, se você marcar, só a diferença para o que já foi pago é cobrada.</p>
+      <div id="tech-cost"></div>
+      <p id="tech-msg" class="msg" role="alert"></p>
+      <div class="modal__actions">
+        <button id="tech-cancel" class="btn btn--ghost" type="button">Cancelar</button>
+        <button id="tech-submit" class="btn" type="submit">Criar técnica</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Inventário de técnicas -->
+  <dialog id="tech-inv-dialog" class="modal modal--wide" aria-labelledby="tech-inv-title">
+    <div>
+      <button class="modal__close" type="button" data-close aria-label="Fechar">×</button>
+      <h2 id="tech-inv-title">Inventário de técnicas</h2>
+      <p id="tech-inv-lead" class="note"></p>
+      <div class="inv-add" id="tech-inv-add">
+        <label for="tech-inv-select">Guardar uma técnica da lista no inventário</label>
+        <div class="inv-add__row">
+          <div class="select-wrap"><select id="tech-inv-select"></select></div>
+          <button id="tech-inv-add-btn" class="btn" type="button">Adicionar</button>
+        </div>
+        <p id="tech-inv-info" class="inv-add__info"></p>
+        <p id="tech-inv-msg" class="msg" role="alert"></p>
+      </div>
+      <ul id="tech-inv-list" class="inv-techs"></ul>
+      <p id="tech-inv-empty" class="empty">Nenhuma técnica guardada. Aqui ficam as técnicas que você aprendeu mas não está usando na lista.</p>
+    </div>
+  </dialog>
+
+  <!-- Lista cheia: guardar a técnica nova? -->
+  <dialog id="tech-keep-dialog" class="modal" aria-labelledby="tech-keep-title">
+    <div>
+      <h2 id="tech-keep-title">Quer guardar essa técnica no seu inventário?</h2>
+      <p class="note">Sua lista de técnicas está cheia. <strong id="tech-keep-name"></strong> pode ir direto pro inventário. Se disser <em>Não</em>, você escolhe uma técnica da lista para ser substituída.</p>
+      <div class="modal__actions">
+        <button id="tech-keep-cancel" class="btn btn--ghost" type="button">Cancelar</button>
+        <button id="tech-keep-no" class="btn btn--ghost" type="button">Não</button>
+        <button id="tech-keep-yes" class="btn" type="button">Sim</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Escolher qual técnica sai da lista -->
+  <dialog id="tech-pick-dialog" class="modal" aria-labelledby="tech-pick-title">
+    <div>
+      <h2 id="tech-pick-title">Escolha uma técnica</h2>
+      <p id="tech-pick-lead" class="note"></p>
+      <ul id="tech-pick-list" class="choose__list"></ul>
+      <div class="modal__actions"><button id="tech-pick-cancel" class="btn btn--ghost" type="button">Cancelar</button></div>
+    </div>
+  </dialog>
+
+  <!-- Personalizar: modelo da ficha e modelo dos atributos (montado por js/fichas.js) -->
+  <dialog id="custom-dialog" class="modal modal--pz" aria-labelledby="custom-title"></dialog>
+
+  <!-- Aviso vermelho no canto inferior da tela -->
+  <div id="toast" class="toast" popover="manual" role="alert"></div>
+
+  <script src="js/ui.js"></script>
+  <script src="js/prato3d.js?v=34"></script>
+  <script src="js/prato.js?v=34"></script>
+  <script src="js/data.js?v=30"></script>
+  <script src="js/subclasses-data.js?v=30"></script>
+  <script src="js/subracas-data.js"></script>
+  <script src="js/classes-exclusivas.js?v=30"></script>
+  <script src="js/transformacoes-data.js"></script>
+  <script src="js/efeitos-data.js?v=30"></script>
+  <script src="js/rules.js?v=30"></script>
+  <script src="js/habilidades.js?v=30"></script>
+  <script src="js/efeitos-ui.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/banco.js"></script>
+  <script src="js/cropper.js"></script>
+  <script src="js/account-ui.js"></script>
+  <script src="js/papeis.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/sessao-data.js?v=26"></script>
+  <script src="js/enciclopedia-data.js"></script>
+  <script src="js/orb.js"></script>
+  <script src="js/atributos.js"></script>
+  <script src="js/fichas-arte.js"></script>
+  <script src="js/tamanho.js"></script>
+  <script src="js/sheet.js?v=30"></script>
+  <script src="js/fichas.js"></script>
+  <script src="js/catalogo.js"></script>
+  <script src="js/escolha.js"></script>
+  <script src="js/escolha-classe.js?v=30"></script>
+  <script src="js/arsenal.js?v=30"></script>
+  <script src="js/rolador.js"></script>
+  <script src="js/transformacoes.js"></script>
+</body>
+</html>

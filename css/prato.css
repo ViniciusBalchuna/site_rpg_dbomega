@@ -1,0 +1,52 @@
+/* Prato de dados: painel no canto da tela que aparece em qualquer rolagem (js/prato.js). */
+.prato { position: fixed; z-index: 60; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); width: min(380px, calc(100vw - 32px)); background: var(--surface, #1b1a2b); color: var(--text, #fff); border: 1px solid var(--gold, #E3B94E); border-radius: 10px; box-shadow: 0 18px 50px rgba(0, 0, 0, .5); transform: translateY(24px) scale(.96); opacity: 0; pointer-events: none; transition: transform .3s cubic-bezier(.2, .9, .3, 1.1), opacity .22s; }
+.prato.is-on { transform: none; opacity: 1; pointer-events: auto; }
+.prato__top { display: flex; align-items: center; gap: 8px; padding: 10px 12px 8px 14px; }
+.prato__top h3 { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 .8rem var(--serif, serif); letter-spacing: .14em; text-transform: uppercase; color: var(--gold, #E3B94E); }
+.prato__ib { appearance: none; border: 0; background: transparent; color: var(--muted, #aaa); cursor: pointer; width: 30px; height: 30px; border-radius: 6px; font-size: 1rem; line-height: 1; display: grid; place-items: center; padding: 0; }
+.prato__ib:hover { color: var(--text, #fff); background: rgba(127, 127, 127, .18); }
+.prato__ib:focus-visible { outline: 2px solid var(--gold, #E3B94E); }
+.prato__felt { position: relative; width: min(300px, calc(100% - 24px)); aspect-ratio: 100 / 86.6; margin: 0 auto; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: #6b5636; touch-action: none; }
+.prato__alvo { position: absolute; inset: 0; width: 100%; height: 100%; }
+.prato__dice { position: absolute; inset: 0; }
+/* Marcador do 2x no centro: hexágono liso e fosco, igual ao alvo (pontas nos lados, reto em cima e embaixo). Cinza e sem efeito quando a pontaria está desligada. */
+.prato__bull { --bull: #b5493f; position: absolute; left: 50%; top: 50%; width: 22%; aspect-ratio: 100 / 86.6; transform: translate(-50%, -50%); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); display: grid; place-items: center; z-index: 1; font: 700 1.1rem ui-monospace, "IBM Plex Mono", monospace; letter-spacing: -.02em; color: #f4ecd8; background: #d8cdb0; }
+.prato__bull::before { content: ""; position: absolute; inset: 3px; z-index: -1; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: var(--bull); }
+.prato__bull.is-off { --bull: #8d8c88; }
+.prato__bull.is-hit { animation: prato-bull .5s ease-out; }
+@keyframes prato-bull { 0% { transform: translate(-50%, -50%) scale(1); } 35% { transform: translate(-50%, -50%) scale(1.18); } 100% { transform: translate(-50%, -50%) scale(1); } }
+.pdie.is-x2 polygon { fill: #fff3c2; stroke: #b5493f; stroke-width: 4; }
+.pdie.is-x2::after { content: "2×"; position: absolute; right: -8px; top: -8px; background: #b5493f; color: #f4ecd8; border: 2px solid #d8cdb0; border-radius: 999px; padding: 0 5px; font: 700 .62rem ui-monospace, monospace; line-height: 1.5; }
+.pdie { z-index: 2; position: absolute; left: 0; top: 0; width: 54px; height: 54px; will-change: transform; }
+.pdie svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 5px 4px rgba(0, 0, 0, .45)); }
+.pdie polygon { fill: #f6efe0; stroke: #c9b98c; stroke-width: 3; stroke-linejoin: round; }
+.pdie .facet { fill: none; stroke: #c9b98c; stroke-width: 1.4; opacity: .7; }
+.pdie text { font: 700 30px ui-monospace, "IBM Plex Mono", monospace; fill: #1b1d2b; text-anchor: middle; dominant-baseline: central; }
+.pdie small { position: absolute; left: 50%; bottom: -15px; transform: translateX(-50%); font: 600 .62rem ui-monospace, monospace; color: rgba(255, 255, 255, .65); }
+.pdie.is-landed polygon { stroke: var(--gold, #E3B94E); }
+.pdie.is-max polygon { fill: #fff3c2; stroke: #e3b94e; }
+.pdie.is-one polygon { fill: #ffd9d4; stroke: #e0584b; }
+.prato__foot { padding: 10px 14px 14px; display: grid; gap: 2px; min-height: 64px; }
+.prato__label { color: var(--muted, #aaa); font-size: .85rem; font-weight: 600; overflow-wrap: anywhere; }
+.prato__sum { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; font: 600 1rem ui-monospace, monospace; }
+.prato__sum b { font-size: 1.6rem; color: var(--gold, #E3B94E); }
+.prato__sum b.is-crit { color: #3ddc97; } .prato__sum b.is-fail { color: #ff6a5c; }
+.prato__sum em { font: 700 .7rem var(--sans, sans-serif); font-style: normal; letter-spacing: .1em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) { .prato { transition: none; } .prato__bull.is-hit { animation: none; } }
+
+/* Soma grande no centro (quando passam de 10 dados: rolam em ciclos) */
+.prato__big { position: absolute; inset: 0; display: grid; place-items: center; z-index: 3; pointer-events: none; opacity: 0; font: 800 3.4rem ui-monospace, "IBM Plex Mono", monospace; color: var(--gold, #E3B94E); text-shadow: 0 0 18px rgba(0, 0, 0, .8), 0 3px 0 rgba(0, 0, 0, .6); background: radial-gradient(closest-side, rgba(0, 0, 0, .45), transparent); }
+.prato__big.is-on { opacity: 1; animation: prato-pop .38s cubic-bezier(.2, 1.5, .4, 1); }
+.prato__big.is-total { color: #fff3c2; text-shadow: 0 0 22px #ffd34d, 0 0 6px #fff, 0 3px 0 rgba(0, 0, 0, .6); animation: prato-choque .5s ease-out; }
+@keyframes prato-pop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes prato-choque { 0% { transform: scale(1.6) rotate(-3deg); filter: brightness(2.5); } 30% { transform: translate(4px, -3px) scale(1.15); } 55% { transform: translate(-4px, 3px) scale(1.1); } 100% { transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .prato__big.is-on, .prato__big.is-total { animation: none; } }
+
+/* Prato 3D (js/prato3d.js): o prato inteiro (borda, argolas, 2x e dados) é desenhado num canvas; as partículas e a
+   soma ficam numa segunda camada por cima. O painel fica um pouco maior para os números dos dados ficarem legíveis. */
+.prato.is-3d { width: min(440px, calc(100vw - 32px)); }
+.prato__felt.is-3d { width: min(420px, calc(100% - 16px)); aspect-ratio: 1 / .88; clip-path: none; background: transparent; }
+.prato__felt.is-3d > .prato__alvo, .prato__felt.is-3d > .prato__bull, .prato__felt.is-3d > .prato__dice, .prato__felt.is-3d > .prato__big { display: none; }
+.prato__felt:not(.is-3d) > .prato3d__cv, .prato__felt:not(.is-3d) > .prato3d__fx { display: none; }
+.prato3d__cv, .prato3d__fx { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.prato3d__fx { z-index: 3; pointer-events: none; }

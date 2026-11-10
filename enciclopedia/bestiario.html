@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="patrol">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow"> <!-- fase de teste: apague ao lançar -->
+  <title>Bestiário | Dragon Ball Omega</title>
+  <link rel="icon" href="../imagem/favicon/favicon_enciclo.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/patrulha.css">
+  <link rel="stylesheet" href="../css/enciclopedia.css">
+  <link rel="stylesheet" href="../css/cropper.css">
+  <script src="../js/theme.js"></script>
+  <script src="../js/transition.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="../index.html">Dragon Ball Omega</a>
+      <nav aria-label="Principal">
+        <ul class="nav">
+          <li><a href="../personagens.html">Personagens</a></li>
+          <li><a href="../enciclopedia.html" aria-current="page">Enciclopédia</a></li>
+          <li><a href="../campanha.html">Campanha</a></li>
+        </ul>
+      </nav>
+      <a class="icon-btn" href="../configuracoes.html" aria-label="Configurações" title="Configurações">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="wrap encyc">
+      <a class="back" href="../enciclopedia.html">Voltar para a Enciclopédia</a>
+      <h1>Bestiário</h1>
+      <p class="encyc__lead">Quem (e o que) anda por aí, organizado em pastas. Só o mestre cria, edita, move e remove pastas e seres.</p>
+      <div class="poster-tools" id="poster-tools" hidden>
+        <button id="del-toggle" class="btn btn--ghost poster-tools__trash" type="button" aria-pressed="false" aria-label="Modo de remoção de seres e pastas" title="Remover seres e pastas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v7M14 10v7"/></svg>
+          <span>Remover</span>
+        </button>
+      </div>
+      <div class="planets">
+        <nav class="planets__tree" aria-label="Pastas e seres"><ul id="tree" class="ptree"></ul><div id="tree-tools" class="ptree__tools" hidden></div></nav>
+        <section id="folder-main" class="planets__main sec-panel" aria-live="polite"></section>
+      </div>
+      <dialog id="rm-dialog" class="enc-dialog enc-dialog--danger" aria-labelledby="rm-title">
+        <h2 id="rm-title">Remover pastas e seres?</h2>
+        <p id="rm-text"></p>
+        <div class="field">
+          <label for="rm-word">Escreva REMOVER para confirmar</label>
+          <input id="rm-word" type="text" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="enc-actions">
+          <button id="rm-keep" class="btn btn--green" type="button">Manter tudo</button>
+          <button id="rm-confirm" class="btn btn--red" type="button" disabled>Remover</button>
+        </div>
+      </dialog>
+      <dialog id="enc-dialog" class="enc-dialog" aria-labelledby="enc-title">
+        <button class="enc-close" type="button" data-close aria-label="Fechar">&times;</button>
+        <h2 id="enc-title"></h2>
+        <form id="enc-form" novalidate></form>
+        <p id="enc-msg" role="alert"></p>
+      </dialog>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">&copy; Dragon Ball Omega</div>
+  </footer>
+  <div id="del-bar" class="del-bar" hidden role="region" aria-label="Remoção de seres e pastas">
+    <span id="del-count" class="del-bar__text"></span>
+    <button id="del-go" class="btn btn--red" type="button" disabled>Remover</button>
+    <button id="del-cancel" class="btn btn--ghost" type="button">Cancelar</button>
+  </div>
+  <div id="toast" class="toast" popover="manual" role="alert"></div>
+  <script src="../js/ui.js"></script>
+  <script src="../js/data.js?v=30"></script>
+  <script src="../js/subclasses-data.js?v=30"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/banco.js"></script>
+  <script src="../js/cropper.js"></script>
+  <script src="../js/papeis.js"></script>
+  <script src="../js/enciclopedia-data.js"></script>
+  <script src="../js/arvore-enc.js"></script>
+  <script src="../js/bestiario.js"></script>
+</body>
+</html>

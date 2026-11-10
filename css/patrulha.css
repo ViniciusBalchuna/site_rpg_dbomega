@@ -1,0 +1,81 @@
+/* =========================================================
+   Dragon Ball Omega — identidade da Enciclopédia
+   Monocromática de roxo, com muito branco (tema claro) ou preto (tema escuro).
+   Use <html class="patrol"> e carregue DEPOIS de style.css.
+   Sumário: 1 Cores · 2 Fundo · 3 Botões
+   ========================================================= */
+
+/* 1. Cores ----------------------------------------------- */
+:root.patrol {
+  --bg: #0A0812;
+  --surface: #151022;
+  --jade: #A78BFA;          /* aqui "jade" vira roxo claro */
+  --gold: #C9BBFF;
+  --text: #F5F2FF;
+  --muted: rgba(245, 242, 255, .76);
+  --line: rgba(167, 139, 250, .32);
+  --on-jade: #FFFFFF;
+  --on-gold: #0A0812;
+  --pat: rgba(167, 139, 250, .09);
+  --header: rgba(10, 8, 18, .92);
+  --glow: rgba(124, 58, 237, .26);
+  --grad-a: #6D28D9;
+  --grad-b: #8B5CF6;
+}
+:root.patrol[data-theme="light"] {
+  --bg: #FBFAFF;
+  --surface: #FFFFFF;
+  --jade: #6D28D9;
+  --gold: #5B21B6;
+  --text: #170F2E;
+  --muted: rgba(23, 15, 46, .78);
+  --line: rgba(91, 33, 182, .26);
+  --on-gold: #FFFFFF;
+  --pat: rgba(109, 40, 217, .08);
+  --header: rgba(251, 250, 255, .94);
+  --glow: rgba(124, 58, 237, .14);
+}
+
+/* 2. Fundo: brilho roxo no topo e poeira de estrelas ------ */
+.patrol body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -8%, var(--glow), transparent 70%),
+    radial-gradient(circle at 1px 1px, var(--pat) 1px, transparent 0);
+  background-size: auto, 34px 34px;
+  background-repeat: no-repeat, repeat;
+}
+.patrol .page, .patrol .site-footer { position: relative; z-index: 1; }
+
+/* 3. Botões em degradê roxo -------------------------------- */
+.patrol .btn:not(.btn--ghost) {
+  background: linear-gradient(135deg, var(--grad-a), var(--grad-b));
+  color: #FFFFFF;
+}
+.patrol .btn:hover { box-shadow: 0 6px 22px rgba(124, 58, 237, .4); }
+.patrol .tab[aria-selected="true"] { color: #FFFFFF; }
+
+/* 4. Emblema decorativo no fundo ---------------------------
+   Desenho próprio (anel, estrela de quatro pontas e órbita), em roxo bem discreto. */
+.patrol body::after {
+  content: "";
+  position: fixed;
+  right: -8vmin;
+  bottom: -10vmin;
+  width: min(86vmin, 760px);
+  aspect-ratio: 1;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(160deg, var(--jade), var(--gold));
+  opacity: .085;
+  animation: emblem-spin 240s linear infinite;
+  will-change: transform;
+  -webkit-mask: var(--emblem) center / contain no-repeat;
+  mask: var(--emblem) center / contain no-repeat;
+  --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='none' stroke='%23000' stroke-linejoin='round'%3E%3Ccircle cx='100' cy='100' r='94' stroke-width='5'/%3E%3Ccircle cx='100' cy='100' r='82' stroke-width='1.6' stroke-dasharray='3 5'/%3E%3Cellipse cx='100' cy='100' rx='70' ry='26' stroke-width='2' transform='rotate(-30 100 100)'/%3E%3Cellipse cx='100' cy='100' rx='70' ry='26' stroke-width='2' transform='rotate(30 100 100)'/%3E%3Cpath d='M100 24 112 88 176 100 112 112 100 176 88 112 24 100 88 88Z' fill='%23000' stroke-width='3'/%3E%3C/g%3E%3Cg fill='%23000'%3E%3Ccircle cx='100' cy='6' r='5'/%3E%3Ccircle cx='100' cy='194' r='5'/%3E%3Ccircle cx='6' cy='100' r='5'/%3E%3Ccircle cx='194' cy='100' r='5'/%3E%3C/g%3E%3C/svg%3E");
+}
+:root.patrol[data-theme="light"] body::after { opacity: .07; }
+
+/* Giro lento e contínuo, sem pausa: uma volta a cada 4 minutos */
+@keyframes emblem-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .patrol body::after { animation: none; } }
