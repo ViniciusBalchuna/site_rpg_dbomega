@@ -13,7 +13,7 @@ compartilhados.
 ![Prato de dados 3D](docs/capturas/prato-3d.gif)
 -->
 
-<!-- 🔗 Site no ar: https://... -->
+<!-- 🔗 Site no ar: https://rpg.dbomega.workers.dev/ -->
 
 ## Destaques
 
@@ -42,7 +42,7 @@ compartilhados.
 | Hospedagem | Arquivos estáticos na Cloudflare, cabeçalhos de segurança em `_headers` |
 | Testes | Playwright (Python) contra o servidor local, no modo local |
 
-Tudo em **português do Brasil**: interface, nomes de funções, comentários e banco.
+Interface, comentários, banco e todos os termos do jogo em **português do Brasil**.
 
 ---
 
@@ -232,7 +232,13 @@ mestre põe e tira tokens e o jogador só move o token do próprio personagem.
 
 ## 7. Convenções
 
-- **Português em tudo**, inclusive nomes de funções e colunas. Comentários explicam o *porquê* e a regra de jogo.
+- **Nomes:** os termos do jogo ficam sempre em português e com o nome que o jogador vê (`rugirDoDragao`,
+  `pdAtual`, `maestria`, `tecnicas`, colunas do banco). Nomes técnicos genéricos podem ficar em inglês (`render`,
+  `save`, `el`, módulos como `DBOSheet`). Um nome descreve o que a coisa **é**: nada de `pd` guardando uma habilidade
+  ou `mult` guardando o tipo de dano.
+- **Valores atuais:** HP, KP e PD atuais vazios (`null` ou `""`) valem "cheio"; leia sempre com `R.hpAtual(c)`,
+  `R.kpAtual(c)` e `R.pdAtual(c)`, nunca `c.hpAtual` direto.
+- **Comentários** explicam o *porquê* e a regra de jogo.
 - **Regras num lugar só:** número do sistema mudou? Mexa em `rules.js` (fórmulas) ou no `*-data.js` (conteúdo).
 - **Sem bibliotecas externas:** a CSP (`script-src 'self'`) bloqueia CDN. Qualquer biblioteca precisa ser copiada
   para `js/` e revisada.

@@ -203,7 +203,7 @@ window.DBOEfeitosUI = (function () {
       return;
     }
     if (d.instantaneo) {   // Morte Instantânea: aplica na hora, se o HP estiver no limiar
-      var hpMax = DBORules.hpMax(c), hp = c.hpAtual == null ? hpMax : Number(c.hpAtual) || 0, lim = FX.valorGrau(d.limiar, estado.grau);
+      var hpMax = DBORules.hpMax(c), hp = DBORules.hpAtual(c), lim = FX.valorGrau(d.limiar, estado.grau);
       if (FX.imune(c, d.id, estado.grau)) { dlg.close(); return UI.toast("Morte Instantânea: você é imune."); }
       dlg.close();
       if (hp > hpMax * lim * 2 / 100) return UI.toast("Morte Instantânea não funciona: seu HP está acima de " + lim * 2 + "% do máximo.");

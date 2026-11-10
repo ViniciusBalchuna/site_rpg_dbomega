@@ -94,7 +94,7 @@
       { id: "criacao-de-materia", nome: "Criação de Matéria", tipo: "Narrativa", interpretativo: true,
         descricao: "Você cria do nada objetos simples, como roupas, ferramentas e armas comuns. Objetos mágicos ou equipamentos com dados de dano só se o mestre deixar. A mesma habilidade com que Kami criou as Esferas do Dragão." },
       { id: "toque-revigorante", nome: "Toque Revigorante", tipo: "Mecânica",
-        descricao: "Uma vez por descanso, fora de combate, cure 25% do HP de um aliado. Bem mais modesto que o Curandeiro, mas ajuda o grupo." }
+        descricao: "Uma vez por descanso, fora de combate, cure 25% do HP de um aliado. Bem mais modesto que o Suporte, mas ajuda o grupo." }
     ],
     "Namekuseijin|Demoníaco": [
       { id: "regeneracao-demoniaca", nome: "Regeneração Demoníaca", tipo: "Mecânica",

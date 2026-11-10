@@ -95,8 +95,9 @@ window.DBORules = (function () {
   }
   // Números do aumento-base da sub-classe do personagem (vazio se não tem sub-classe).
   function baseSub(c) { var i = (DBOData.SUBCLASS_INFO || {})[c.subclasse]; return (i && i.numeros) || {}; }
-  // Rugir do Dragão da sub-classe: automático a partir do nível 20 (DBOData.SUBCLASS_UNLOCK[0]).
-  function gastoDragao(c) {
+  // Rugir do Dragão da sub-classe (a definição da habilidade): automático a partir do nível 20 (DBOData.SUBCLASS_UNLOCK[0]).
+  // null antes do nível 20 ou sem sub-classe. Os Pontos do Dragão que ele gasta são pdMax / pdAtual.
+  function rugirDoDragao(c) {
     var l = (DBOData.SUBCLASS_ABILITIES || {})[c.subclasse] || [];
     var d = l.filter(function (x) { return x.dragao; })[0];
     var nv = ((DBOData.SUBCLASS_UNLOCK || {})[0]) || 20;
@@ -111,14 +112,14 @@ window.DBORules = (function () {
   // Bônus de modificador de habilidades genéricas de texto (Sensor de Presença: +1 CON na maestria 2).
   function bonusGenericas(c, chave) {
     var t = 0;
-    agrupadas(c).forEach(function (g) {
+    habilidadesAgrupadas(c).forEach(function (g) {
       var m = g.def.generica && g.def.mods && g.def.mods[chave];
       if (m) t += m[Math.min(g.copias, g.def.max) - 1] || 0;
     });
     return t;
   }
-  // Mesmas habilidades de classe, agrupadas: [{ def, copias }] na ordem em que aparecem (as genéricas repetidas viram uma só, com mais maestria).
-  function agrupadas(c) {
+  // Habilidades de classe do personagem, agrupadas: [{ def, copias }] na ordem em que aparecem (as genéricas repetidas viram uma só, com mais maestria).
+  function habilidadesAgrupadas(c) {
     var out = [], idx = {};
     (c.habilidadesClasse || []).forEach(function (id) {
       var d = defClasse(id);
@@ -150,7 +151,8 @@ window.DBORules = (function () {
     return out;
   }
   // As habilidades de classe do personagem, já como definições (ids que não existem mais são ignorados).
-  function minhasClasse(c) {
+  // Definições de todas as habilidades de classe que o personagem tem (uma por id em c.habilidadesClasse, com repetições).
+  function habilidadesDeClasse(c) {
     return (c.habilidadesClasse || []).map(defClasse).filter(Boolean);
   }
   // Limite de pontos (TP) em um único atributo, por nível: de 15 em 15 níveis.
@@ -214,7 +216,7 @@ window.DBORules = (function () {
     if (bs.corpo) { p.corpo += bs.corpo; fonte("corpo", c.subclasse, bs.corpo); }
     if (bs.ki) { p.mult.ki += bs.ki; fonte("ki", c.subclasse, bs.ki); }
     if (bs.fisico) { p.mult.fisico += bs.fisico; fonte("fisico", c.subclasse, bs.fisico); }
-    agrupadas(c).forEach(function (g) {
+    habilidadesAgrupadas(c).forEach(function (g) {
       var def = g.def;
       if (def.sub) {
         var n = def.numeros || {};
@@ -278,7 +280,7 @@ window.DBORules = (function () {
     bonusIniciativa: function (c) { return passivos(c).iniciativa; },
     fatorMult: fatorMult, custoIncremento: custoIncremento, descontoTp: descontoTp,
     // Maestria de uma habilidade genérica no personagem (0 = não tem).
-    maestriaGenerica: function (c, id) { var g = agrupadas(c).filter(function (x) { return x.def.id === id; })[0]; return g ? Math.min(g.copias, g.def.max) : 0; },
+    maestriaGenerica: function (c, id) { var g = habilidadesAgrupadas(c).filter(function (x) { return x.def.id === id; })[0]; return g ? Math.min(g.copias, g.def.max) : 0; },
     CUSTO_TP_DADO: CUSTO_TP_DADO, FATOR_DADOS: FATOR_DADOS, LIMITE_TP: LIMITE_TP, custoTecnica: custoTecnica, custoDados: custoDados, custoDadosAlvo: custoDadosAlvo,
     // Modificador de um atributo.
     //   0 a 9: começa em -5 e sobe 1 a cada 2 pontos, chegando a 0 no 9.
@@ -362,8 +364,11 @@ window.DBORules = (function () {
     // Pontos do Dragão: 1 no começo e +1 a cada 25 níveis (9 no nível 200).
     furiaMax: furiaMax, furiaAtual: furiaAtual, poderSemLimite: poderSemLimite, limiteAtributo: limiteAtributo, proximoLimiteAtributo: proximoLimiteAtributo, nivelDoLimite: nivelDoLimite,
     pdMax: function (c) { return Math.min(9, 1 + Math.floor((c.nivel || 1) / 25)); },
+    // HP e KP atuais: vazio (null ou "") = cheio, como os Pontos do Dragão. Use sempre estas, não c.hpAtual direto.
+    hpAtual: function (c) { return c.hpAtual == null || c.hpAtual === "" ? this.hpMax(c) : Number(c.hpAtual) || 0; },
+    kpAtual: function (c) { return c.kpAtual == null || c.kpAtual === "" ? this.kpMax(c) : Number(c.kpAtual) || 0; },
     pdAtual: function (c) { var m = this.pdMax(c); return c.pdAtual == null || c.pdAtual === "" ? m : Math.max(0, Math.min(m, Number(c.pdAtual) || 0)); },
-    crescimento: function (c) { return crescimentoVida(c); },
+    crescimentoVida: function (c) { return crescimentoVida(c); },
     // A classe aceita o alinhamento? (DBOData.CLASS_ALIGNMENT: o Suporte só aceita alinhamentos Bons.)
     alinhamentoOk: function (classe, alinhamento) {
       var req = (DBOData.CLASS_ALIGNMENT || {})[classe];
@@ -388,9 +393,9 @@ window.DBORules = (function () {
     contaTecnicas: function (c) {
       return (c.tecnicas || []).filter(function (t) { return !t.guardada && t.nome !== "Soco"; }).length;
     },
-    defClasse: defClasse, defSubclasse: defSubclasse, gastoDragao: gastoDragao, agrupadas: agrupadas, totalGenerica: totalGenerica, maestriaClasse: maestriaClasse, efeitosAtivos: efeitosAtivos, minhasClasse: minhasClasse, passivos: passivos,
+    defClasse: defClasse, defSubclasse: defSubclasse, rugirDoDragao: rugirDoDragao, habilidadesAgrupadas: habilidadesAgrupadas, totalGenerica: totalGenerica, maestriaClasse: maestriaClasse, efeitosAtivos: efeitosAtivos, habilidadesDeClasse: habilidadesDeClasse, passivos: passivos,
     limiteClasse: limiteClasse, maestriaExclusiva: maestriaExclusiva, exclusivaDoPersonagem: exclusivaDoPersonagem, inicialDaClasse: inicialDaClasse,
-    contaClasse: function (c) { return minhasClasse(c).length; },
+    contaClasse: function (c) { return habilidadesDeClasse(c).length; },
     limiteInventario: function (c) { return c.npc ? Infinity : Math.max(0, 5 + this.mod(c, "forca") + passivos(c).espacoInv); }
   };
 })();

@@ -335,7 +335,7 @@ window.DBOEfeitos = (function () {
   var GRAU_KP = [1, 1.5, 2, 3];
   // KP dos efeitos ao usar a técnica: peso do efeito x crescimento do nível x grau x alvo x duração. Golpe físico sem ki e penalidade no conjurador não cobram. { total, reduz }
   function kpEfeitos(t, c, maestria) {
-    var R = window.DBORules, cresc = R && R.crescimento ? R.crescimento(c) : 1, total = 0, lista = itens(t);
+    var R = window.DBORules, cresc = R && R.crescimentoVida ? R.crescimentoVida(c) : 1, total = 0, lista = itens(t);
     lista.forEach(function (e) {
       if (e.fis || e.def.id === "aprimorar" || !e.def.kp) return;
       if (e.def.tipo === "penalidade" && e.alvo === "conj") return;
@@ -420,7 +420,7 @@ window.DBOEfeitos = (function () {
         var m = DBORules.maestriaGenerica(c, def.id);
         Object.keys(def.imune).forEach(function (ef) { if (m >= def.imune[ef]) cobre(ef, 3); });
       });
-      DBORules.minhasClasse(c).forEach(function (def) {
+      DBORules.habilidadesDeClasse(c).forEach(function (def) {
         if (def.generica || def.sub || def.exclusiva) return;
         DBORules.efeitosAtivos(def, c.nivel).forEach(function (x) { if (x.tipo === "imunidade") cobre(x.efeito, x.grau); });
       });
@@ -492,7 +492,7 @@ window.DBOEfeitos = (function () {
      Devolve { patch: { hpAtual?, kpAtual?, efeitosAtivos }, msgs }. */
   function turno(c, fase, soEste) {
     var R = window.DBORules, hpMax = R.hpMax(c), kpMax = R.kpMax(c);
-    var hp = c.hpAtual == null ? hpMax : Number(c.hpAtual) || 0, kp = c.kpAtual == null ? kpMax : Number(c.kpAtual) || 0;
+    var hp = R.hpAtual(c), kp = R.kpAtual(c);   // vazio = cheio
     var hp0 = hp, kp0 = kp, msgs = [], lista = (c.efeitosAtivos || []).map(function (e) { return Object.assign({}, e); });
     var cura = fatorCura(c);
     // Reator Infinito (Androide): +5% do KP máximo no começo de cada turno (não vale no "Passar rodada" de um efeito só).

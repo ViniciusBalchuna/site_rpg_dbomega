@@ -36,8 +36,8 @@
   function mestre() { return DBORoles.isMaster(); }
 
   // KP atual (vazio = cheio) e o KP depois de gastar.
-  function kpDe(c) { return c.kpAtual == null || c.kpAtual === "" ? R.kpMax(c) : Number(c.kpAtual) || 0; }
-  function hpDe(c) { return c.hpAtual == null || c.hpAtual === "" ? R.hpMax(c) : Number(c.hpAtual) || 0; }
+  function kpDe(c) { return R.kpAtual(c); }
+  function hpDe(c) { return R.hpAtual(c); }
   function semKp(c, custo) { return Math.max(0, kpDe(c) - (Number(custo) || 0)); }
   function atual(c) { return (DBOCharacters.get && DBOCharacters.get(c.id)) || c; }
   // HP depois de gastar HP no lugar de KP; sem gasto, não mexe.
@@ -268,19 +268,19 @@
 
   // Técnicas de classe: o Rugir do Dragão em cima (gasta Pontos do Dragão), depois as habilidades de classe e de sub-classe.
   function classBlock(c) {
-    var pd = R.gastoDragao(c), grupos = R.agrupadas(c);
-    if (!pd && !grupos.length) return null;
+    var rugir = R.rugirDoDragao(c), grupos = R.habilidadesAgrupadas(c);
+    if (!rugir && !grupos.length) return null;
     var b = box("fight-class");
     b.appendChild(el("h3", "", "Técnicas de Classe"));
     var ul = el("ul", "techs");
-    if (pd) {
-      var ctxPd = ctxFor(c, null);
-      ctxPd.onPd = function (n) {
+    if (rugir) {
+      var ctxRugir = ctxFor(c, null);
+      ctxRugir.onPd = function (n) {
         var cur = atual(c);
         try { DBOCharacters.update(cur.id, { pdAtual: Math.max(0, R.pdAtual(cur) - n) }); UI.toast("Rugir do Dragão usado: −" + n + " PD."); } catch (err) { UI.toast(err.message); }
         render();
       };
-      ul.appendChild(A.node(A.daClasse(pd, c), pd.id, "li", false, c, ctxPd));
+      ul.appendChild(A.node(A.daClasse(rugir, c), rugir.id, "li", false, c, ctxRugir));
     }
     grupos.forEach(function (g) {
       var a = g.def.generica ? A.daGenerica(g.def, g.copias, c) : g.def.exclusiva ? A.daExclusiva(g.def, g.copias, c) : A.daClasse(g.def, c);
@@ -998,8 +998,8 @@
     grid.appendChild(efb);
 
     var hab = el("section", "resumo__bloco"); hab.appendChild(el("h4", "", "Habilidades"));
-    var nomes = R.agrupadas(c).map(function (g) { return g.def.nome + (g.copias > 1 ? " (maestria " + g.copias + ")" : ""); });
-    var gd = R.gastoDragao(c); if (gd) nomes.unshift(gd.nome);
+    var nomes = R.habilidadesAgrupadas(c).map(function (g) { return g.def.nome + (g.copias > 1 ? " (maestria " + g.copias + ")" : ""); });
+    var rugir = R.rugirDoDragao(c); if (rugir) nomes.unshift(rugir.nome);
     var rac = R.habilidadesRaciais ? R.habilidadesRaciais(c).map(function (h) { return h.nome; }) : [];
     if (!nomes.length && !rac.length) hab.appendChild(el("p", "empty", "Nenhuma habilidade de classe ou raça."));
     if (nomes.length) { hab.appendChild(el("p", "resumo__sub", "Classe e sub-classe")); var u1 = el("ul", "resumo__lista"); nomes.forEach(function (n) { u1.appendChild(el("li", "", n)); }); hab.appendChild(u1); }

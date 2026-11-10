@@ -1007,7 +1007,7 @@
   // Janela de confirmação da troca de classe. `ok` roda se a pessoa confirmar.
   function confirmClassChange(patch, nova, ok) {
     var box = $("class-confirm-dialog");
-    var perdidas = R.agrupadas(c).map(function (g) { return g.def.nome + (g.copias > 1 ? " (maestria " + g.copias + ")" : ""); });
+    var perdidas = R.habilidadesAgrupadas(c).map(function (g) { return g.def.nome + (g.copias > 1 ? " (maestria " + g.copias + ")" : ""); });
     var ini = R.inicialDaClasse(nova);
     $("class-confirm-lost").textContent = perdidas.length ? perdidas.join(", ") : "nenhuma por enquanto";
     $("class-confirm-new").textContent = ini ? ini.nome : "nenhuma";

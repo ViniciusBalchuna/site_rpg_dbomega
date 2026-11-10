@@ -62,7 +62,7 @@
   function fmt(n) { return UI.fmt(Math.round(n)); }
   function sgn(n) { return n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0"; }
   function die(s) { return Math.floor(Math.random() * s) + 1; }
-  function cresc(f) { return "×" + R.crescimento(f).toLocaleString("pt-BR", { maximumFractionDigits: 3 }); }
+  function cresc(f) { return "×" + R.crescimentoVida(f).toLocaleString("pt-BR", { maximumFractionDigits: 3 }); }
   function contaVital(f, k) {
     var cls = R.classeBase(f), attr = k === "hp" ? "resistencia" : "espirito", m = R.mod(f, attr), p = R.passivos(f);
     var rows = [["Base da classe (" + f.classe + ")", fmt(cls[k])], [(k === "hp" ? "Resistência" : "Espírito") + " (mod. " + sgn(m) + " × 2.000)", (m < 0 ? "−" : "+") + fmt(Math.abs(2000 * m))]];
@@ -352,15 +352,15 @@
     // Técnicas de classe e de sub-classe (o Rugir do Dragão fica em cima, dourado)
     var cp = painel("Técnicas de classe e de sub-classe");
     var lista = el("ul", "techs dbg-list");
-    var pd = R.gastoDragao(f);
-    if (pd) lista.appendChild(A.node(A.daClasse(pd, f), "dbg-" + pd.id, "li", false, f, { rolls: {}, opened: ui.aberto, get: function () { return f; }, refresh: render }));
-    R.agrupadas(f).forEach(function (g, i) {
+    var rugir = R.rugirDoDragao(f);
+    if (rugir) lista.appendChild(A.node(A.daClasse(rugir, f), "dbg-" + rugir.id, "li", false, f, { rolls: {}, opened: ui.aberto, get: function () { return f; }, refresh: render }));
+    R.habilidadesAgrupadas(f).forEach(function (g, i) {
       var def = g.def, rot = def.sub ? A.rotuloSub(def) : def.generica ? "Genérica · maestria " + g.copias : def.exclusiva ? "Exclusiva · " + def.classe + " · cópias " + g.copias : "Inicial · " + def.classe;
       lista.appendChild(cartao("h-" + def.id, def.nome + (g.copias > 1 ? " ×" + g.copias : ""), rot, linhasDe(def, f), function () {
         var idx = c.habilidadesClasse.lastIndexOf(def.id), nova = c.habilidadesClasse.slice(); nova.splice(idx, 1); set({ habilidadesClasse: nova });
       }, def.sub ? "is-sub" : ""));
     });
-    if (!pd && !R.agrupadas(f).length) lista.appendChild(el("li", "dbg-empty", "Nenhuma técnica de classe."));
+    if (!rugir && !R.habilidadesAgrupadas(f).length) lista.appendChild(el("li", "dbg-empty", "Nenhuma técnica de classe."));
     cp.appendChild(lista);
     cp.appendChild(btn("Pegar qualquer habilidade (catálogo)", "btn", function () {
       DBOClassPicker.open(f, function (id) { set({ habilidadesClasse: (c.habilidadesClasse || []).concat([id]) }); return ""; }, { semTrava: true });

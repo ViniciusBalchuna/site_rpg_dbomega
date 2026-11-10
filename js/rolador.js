@@ -7,7 +7,7 @@
   if (!box) return;
 
   var TYPES = ["d3", "d4", "d6", "d8", "d10", "d12", "d20", "d100"];
-  var state = { mult: null, groups: [{ qtd: 1, dado: "d6" }], inc: 0, mod: "", result: null };
+  var state = { tipoDano: null, groups: [{ qtd: 1, dado: "d6" }], inc: 0, mod: "", result: null };
   var tiles = {}, built = false, groupsBox, out, msg, modSel, incIn;
 
   function die(sides) { return Math.floor(Math.random() * sides) + 1; }
@@ -28,7 +28,7 @@
       t.appendChild(el("b", "mult__value", ""));
       t.appendChild(el("small", "mult__hint", "Clique para multiplicar"));
       t.addEventListener("click", function () {
-        state.mult = state.mult === m[0] ? null : m[0];
+        state.tipoDano = state.tipoDano === m[0] ? null : m[0];
         sync();
       });
       tiles[m[0]] = t;
@@ -139,12 +139,12 @@
     var pend = isTest && state.mod && window.DBOAbility ? DBOAbility.usarPendente(c, state.mod) : null;
     if (pend) { fixos.push({ rot: "ativação (" + pend.fonte + ")", val: pend.valor }); soma += pend.valor; }
     // Habilidades de classe: bônus fixo em rolagens de dano (qualquer rolagem que não seja um teste simples de d20).
-    if (!isTest && state.mult) { var pd = R.passivos(c).dano[state.mult] || 0; if (pd) { fixos.push({ rot: "habilidades de classe", val: pd }); soma += pd; } }
+    if (!isTest && state.tipoDano) { var danoPassivo = R.passivos(c).dano[state.tipoDano] || 0; if (danoPassivo) { fixos.push({ rot: "habilidades de classe", val: danoPassivo }); soma += danoPassivo; } }
     var tb = isTest ? t.teste : t.dano;
     if (tb) { fixos.push({ rot: isTest ? "transformação (testes)" : "transformação (danos)", val: tb }); soma += tb; }
     var raw = Math.max(0, soma);
-    var mult = state.mult ? multOf(c, state.mult) : 1;
-    var resultado = { partes: partes, fixos: fixos, raw: raw, mult: state.mult ? mult : null, total: raw * mult };
+    var mult = state.tipoDano ? multOf(c, state.tipoDano) : 1;
+    var resultado = { partes: partes, fixos: fixos, raw: raw, mult: state.tipoDano ? mult : null, total: raw * mult };
     out.textContent = "";
     var titulo = isTest ? "Teste de d20" : "Rolador de dados";
     if (window.DBOPrato) DBOPrato.rolar(titulo, dados, function () { state.result = resultado; showResult(); },
@@ -161,7 +161,7 @@
     var itens = r.partes.map(function (p) { return p.rot + ": " + p.faces.join(" + "); });
     r.fixos.forEach(function (f) { itens.push(f.rot + " " + signed(f.val)); });
     card.appendChild(el("small", "", "(" + itens.join(" · ") + ") = " + UI.fmt(r.raw) +
-      (r.mult ? " × " + UI.fmt(r.mult) + " (" + (state.mult === "ki" ? "dano de Ki" : "dano físico") + ")" : " (sem multiplicador)")));
+      (r.mult ? " × " + UI.fmt(r.mult) + " (" + (state.tipoDano === "ki" ? "dano de Ki" : "dano físico") + ")" : " (sem multiplicador)")));
     out.appendChild(card);
   }
 
@@ -169,7 +169,7 @@
     var c = S.get();
     if (!c) return;
     ["fisico", "ki"].forEach(function (k) {
-      var t = tiles[k], on = state.mult === k;
+      var t = tiles[k], on = state.tipoDano === k;
       t.querySelector(".mult__value").textContent = "×" + UI.fmt(multOf(c, k));
       t.classList.toggle("is-on", on);
       t.setAttribute("aria-pressed", String(on));

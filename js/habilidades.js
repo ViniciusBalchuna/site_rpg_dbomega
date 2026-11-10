@@ -9,7 +9,7 @@
 window.DBOAbility = (function () {
   var D = DBOData, UI = DBOUI, R = DBORules, el = UI.el;
   // KP atual (vazio = cheio).
-  function kpDe(c) { return c.kpAtual == null || c.kpAtual === "" ? R.kpMax(c) : Number(c.kpAtual) || 0; }
+  function kpDe(c) { return R.kpAtual(c); }
 
   var DIE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">' +
     '<path d="M12 2.5 20.5 7.4v9.2L12 21.5 3.5 16.6V7.4z"/><path d="M12 2.5 3.5 16.6h17z"/><path d="M3.5 7.4 12 21.5l8.5-14.1"/></svg>';
@@ -220,7 +220,7 @@ window.DBOAbility = (function () {
     if (pd && host) { host.save({ pdAtual: Math.max(0, R.pdAtual(host.get()) - pd) }); msgs.push("−" + pd + " PD"); }
     if (u.vezes) marcarUso(host, t.id);
     if (u.hp && host) {
-      var c2 = host.get(), mx = R.hpMax(c2), hp = c2.hpAtual == null ? mx : Number(c2.hpAtual) || 0, novo = Math.min(mx, hp + Math.round(mx * u.hp));
+      var c2 = host.get(), mx = R.hpMax(c2), hp = R.hpAtual(c2), novo = Math.min(mx, hp + Math.round(mx * u.hp));
       host.save({ hpAtual: novo }); msgs.push("+" + UI.fmt(novo - hp) + " HP");
     }
     (u.efeitos || []).forEach(function (e) {
@@ -435,11 +435,11 @@ window.DBOAbility = (function () {
       total += m;
     }
     if (a.fixo) { fixos.push({ rot: "fixo", val: Number(a.fixo) }); total += Number(a.fixo); }
-    var pd = R.passivos(c).dano[a.tipo] || 0;
+    var danoPassivo = R.passivos(c).dano[a.tipo] || 0;   // bônus fixo de dano das habilidades de classe
     var fu = a.tipo === "fisico" ? R.furiaAtual(c) : 0;   // Fúria do Berserker já está dentro de passivos.dano; aqui aparece separada
     var psl = a.tipo === "fisico" ? R.poderSemLimite(c) : 0;   // Poder Sem Limite (Sayajin Lendário), também separado
-    pd -= fu + psl;
-    if (pd) { fixos.push({ rot: "habilidades de classe", val: pd }); total += pd; }
+    danoPassivo -= fu + psl;
+    if (danoPassivo) { fixos.push({ rot: "habilidades de classe", val: danoPassivo }); total += danoPassivo; }
     if (fu) { fixos.push({ rot: "Fúria", val: fu }); total += fu; }
     if (psl) { fixos.push({ rot: "Poder Sem Limite", val: psl }); total += psl; }
     var tb = window.DBOTransf ? DBOTransf.bonus(c).dano : 0;
@@ -663,7 +663,7 @@ window.DBOAbility = (function () {
         var cur = ctx.get(), custo = custoComReforco(t, cur), rf = reforcoPara(cur, t);
         var trava = bloqueioEfeitos(cur, t.tipo === "ki" && temDano(t) ? "ki" : custo > 0 ? "kp" : "acao");
         if (trava) { UI.bigAlert("Interação falhou: " + trava + "\nSeu uso foi negado."); return; }
-        var hpc = custoHp(t, cur), hpAt = cur.hpAtual == null || cur.hpAtual === "" ? R.hpMax(cur) : Number(cur.hpAtual) || 0;
+        var hpc = custoHp(t, cur), hpAt = R.hpAtual(cur);
         if (hpc && hpAt - hpc < 1) { UI.bigAlert("Interação falhou: HP insuficiente.\nSeu uso foi negado."); return; }
         if (!hpc && kpDe(cur) < custo) { UI.bigAlert("Interação falhou: KI insuficiente.\nSeu uso foi negado."); return; }
         // Na Sessão (combate), escolhe os alvos antes; cancelar não gasta nada.

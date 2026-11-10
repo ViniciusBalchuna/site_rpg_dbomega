@@ -12,7 +12,7 @@
   // Botão "Usar": gasta o KP e soma 1 uso. Os mesmos em Equipamentos/Técnicas e na lista "Habilidades com dano" (Navegação).
   // HP depois de gastar HP no lugar de KP ("Gastar HP, ao invés de KP"). Sem gasto, mantém o HP como está.
   function hpDepois(cur, hp) {
-    var atual = cur.hpAtual == null || cur.hpAtual === "" ? R.hpMax(cur) : Number(cur.hpAtual) || 0;
+    var atual = R.hpAtual(cur);
     return hp ? Math.max(1, atual - hp) : cur.hpAtual;
   }
   function useTech(t) {
@@ -177,13 +177,13 @@
     listClass.textContent = "";
     var usados = R.contaClasse(c), lim = R.limiteClasse(c);
     // Rugir do Dragão: técnica de classe especial, automática no nível 20, sempre em cima de todas e dourada.
-    var pd = R.gastoDragao(c);
-    if (pd) {
-      var ctxPd = ctxFor(null);
-      if (!SHEET_VIEW()) ctxPd.onPd = function (n) { var cur = S.get(); S.save({ pdAtual: Math.max(0, R.pdAtual(cur) - n) }); UI.toast("Rugir do Dragão usado: −" + n + " PD."); };
-      listClass.appendChild(A.node(A.daClasse(pd, c), pd.id, "li", false, c, ctxPd));
+    var rugir = R.rugirDoDragao(c);
+    if (rugir) {
+      var ctxRugir = ctxFor(null);
+      if (!SHEET_VIEW()) ctxRugir.onPd = function (n) { var cur = S.get(); S.save({ pdAtual: Math.max(0, R.pdAtual(cur) - n) }); UI.toast("Rugir do Dragão usado: −" + n + " PD."); };
+      listClass.appendChild(A.node(A.daClasse(rugir, c), rugir.id, "li", false, c, ctxRugir));
     }
-    R.agrupadas(c).forEach(function (g) {
+    R.habilidadesAgrupadas(c).forEach(function (g) {
       var a = g.def.generica ? A.daGenerica(g.def, g.copias, c) : g.def.exclusiva ? A.daExclusiva(g.def, g.copias, c) : A.daClasse(g.def, c);
       var cn = A.node(a, g.def.id, "li", false, c, ctxFor(g.def.cura ? function (custo) { spendKp(custo); } : null));
       if (!SHEET_VIEW() && opened[g.def.id] && !rolls[g.def.id]) {
