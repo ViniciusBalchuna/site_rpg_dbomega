@@ -22,13 +22,24 @@
 //   um clique mira, arrastar a bolinha amarela gira).
 // Olho (mestre na Sessão, ao lado da engrenagem): ver o mapa exatamente como um jogador ou NPC vê; os botões continuam.
 // Escadas: vistas do andar de cima aparecem claras com uma setinha para baixo; as que sobem, com setinha para cima;
-//   escadas juntas ganham um símbolo só (⇅ se o grupo sobe e desce).
+//   escadas juntas ganham um símbolo só (⇅ se o grupo sobe e desce). Com chão desenhado em cima da escada (alçapão),
+//   ela aparece de leve no andar de cima, para mostrar de onde se desce. Escada não tem parede em volta: as paredes finas
+//   encostadas nela não barram nem aparecem, e quadrado/círculo "com paredes" desenhando escada não põem paredes.
+// Telhado (visão de jogador): bloco de um layer acima de quem olha, com chão embaixo, aparece mais escuro e esconde
+//   quem está embaixo dele; quem entra embaixo (aquele pedaço coberto) deixa de ver o telhado e vê o andar de baixo.
+// Memória (sombras ligadas, engrenagem → "Lembrar lugares já vistos"): o que o token já viu fica mais apagado quando ele
+//   sai de perto, sem mostrar quem está lá (guardado neste navegador, localStorage "dbo-mapa-memoria").
 // Tamanho (NPC, opts.tamanho): o token ocupa N×N blocos a partir do canto de cima, à esquerda (x, y);
 // o pequeno (0,5) é desenhado menor, mas anda de bloco em bloco. Paredes e relevo valem para todos os blocos que ele ocupa.
 // Ferramentas (barra de baixo; parar o mouse em cima por meio segundo abre as opções):
-//   Caneta (espaço / parede) · Cor · Quadrado (vazio / com paredes em volta / só paredes) · Círculo (as mesmas)
-//   Régua (blocos de distância) · Borracha (normal / quadrado inteiro / só a borda do quadrado)
-//   Explosão (cone com ângulo / círculo / quadrado: a área vira terra) · Engrenagem (mostrar grade, cor da grade)
+//   Mão (só arrasta a vista e os tokens; Esc volta para ela) · Caneta (espaço / parede) · Cor
+//   Quadrado (vazio / com paredes em volta / só paredes) · Círculo (as mesmas)
+//   Régua (blocos de distância): não pega tokens e começa dentro do token clicado; o 2º clique (ou soltar depois de
+//     arrastar) fixa a régua nos dois blocos e ela fica na tela com qualquer ferramenta; clicar numa régua fixa solta ela
+//     de novo (outro clique fixa, Esc apaga). Réguas fixas são só de quem mediu.
+//   Borracha (normal / quadrado inteiro / só a borda do quadrado)
+//   Explosão (cone com ângulo / círculo / quadrado: a área vira terra)
+//   Engrenagem: pop-up de configurações com busca (mestre: visão, grade, fundo, réguas; jogador: borda do token, réguas)
 // Navegar: rodinha do mouse = zoom; arrastar com o botão direito, o do meio ou segurando Espaço = mover. Ctrl+Z desfaz.
 // O mapa fica salvo neste navegador (localStorage "dbo-mapa"). Exportar gera JPG/PNG ou o arquivo .dbomapa;
 // importar aceita uma imagem (com a grade por cima) ou um .dbomapa (o mapa volta inteiro, com paredes de verdade).
@@ -163,7 +174,7 @@ window.DBOMapa = (function () {
     var gr = d.grade ? { on: d.grade.on !== false, cor: d.grade.cor, espessura: espessura(d.grade.esp) } : null;
     var out = { formato: "dbo-mapa", versao: 2, titulo: d.titulo || "Mapa sem título", origem: isFinite(x0) ? [x0, y0] : [0, 0],
       grade: gr || { on: true, cor: "rgba(120, 136, 160, 0.45)", espessura: 1 }, papel: d.papel || null, legenda: legenda,
-      faixa: faixa, sombras: !!d.sombras, caverna: !!d.caverna, muros: d.muros && d.muros.length ? d.muros : undefined,
+      faixa: faixa, sombras: !!d.sombras, caverna: !!d.caverna, semMemoria: d.semMemoria ? true : undefined, muros: d.muros && d.muros.length ? d.muros : undefined,
       nevoa: d.nevoa && d.nevoa.length ? d.nevoa : undefined, textos: d.textos && d.textos.length ? d.textos : undefined, layers: layers, fundo: d.fundo || null };
     // uma linha do mapa por linha do arquivo: fica legível (e editável) num editor de texto
     var json = JSON.stringify(out, null, 2);
@@ -226,7 +237,7 @@ window.DBOMapa = (function () {
     var corPrincipal = cor(d.cor, "");
     if (!corPrincipal) { var esp = celulas.filter(function (c) { return c[2] === "espaco"; })[0]; corPrincipal = esp ? esp[3] : "rgb(255, 255, 255)"; }
     var fx = Array.isArray(d.faixa) && d.faixa.length === 2 ? [Math.round(+d.faixa[0]) || 0, Math.round(+d.faixa[1]) || 2] : null;
-    return { v: 2, titulo: titulo, celulas: celulas, cor: corPrincipal, grade: grade, papel: papel, fundo: fundo, layers: fx, sombras: d.sombras === true, caverna: d.caverna === true,
+    return { v: 2, titulo: titulo, celulas: celulas, cor: corPrincipal, grade: grade, papel: papel, fundo: fundo, layers: fx, sombras: d.sombras === true, caverna: d.caverna === true, semMemoria: d.semMemoria === true,
       muros: Array.isArray(d.muros) ? d.muros.filter(function (k) { return typeof k === "string"; }).slice(0, 20000) : [],
       nevoa: Array.isArray(d.nevoa) ? d.nevoa.filter(function (k) { return typeof k === "string"; }).slice(0, 20000) : [],
       textos: Array.isArray(d.textos) ? d.textos.slice(0, 500) : [] };
@@ -316,8 +327,16 @@ window.DBOMapa = (function () {
     return null;
   }
   function bordaDoVazio(ax, ay, bx, by) { return mapa.celulas.size > 0 && !coluna(ax, ay) !== !coluna(bx, by); }
+  // Escada que liga o layer L a este lugar: a de L (pé da escada) ou a de L - 1 (o topo dela chega em L).
+  function escadaLiga(x, y, L) { return ehEscada(blocoEm(x, y, L)) || ehEscada(blocoEm(x, y, L - 1)); }
+  // Parede fina "de verdade" nesta borda: as que encostam numa escada não contam (escada não tem parede em volta).
+  function muroFino(k) {
+    if (!k || !mapa.muros.has(k)) return false;
+    var p = k.split(","), x = +p[0], y = +p[1], L = +p[2], ax = p[3] === "h" ? x : x - 1, ay = p[3] === "h" ? y - 1 : y;
+    return !escadaLiga(x, y, L) && !escadaLiga(ax, ay, L);
+  }
   // Parede (fina ou de borda) entre dois blocos vizinhos (de lado), no layer L.
-  function muroEntre(ax, ay, bx, by, L) { var k = muroK(ax, ay, bx, by, L); return (!!k && mapa.muros.has(k)) || bordaDoVazio(ax, ay, bx, by); }
+  function muroEntre(ax, ay, bx, by, L) { return muroFino(muroK(ax, ay, bx, by, L)) || bordaDoVazio(ax, ay, bx, by); }
   // Passo de um bloco para o vizinho (também na diagonal: só fecha se os dois caminhos em L tiverem parede).
   function passoBarrado(ax, ay, bx, by, L) {
     var dx = bx - ax, dy = by - ay;
@@ -357,6 +376,48 @@ window.DBOMapa = (function () {
     return col[0];
   }
   function layerVisivel(x, y, V) { var b = blocoVisivel(x, y, V); return b ? b.L : null; }
+  /* Telhado: bloco de um layer mais alto que quem olha, com chão embaixo (o lugar é coberto). Quem está fora vê o bloco
+     de cima, mais escuro, e não vê quem está embaixo dele; quem entra embaixo (o pedaço coberto em que o token está, até
+     onde o telhado vai sem parar) deixa de ver esse telhado e vê só o andar de baixo. Vale para a visão de jogador
+     (e para o mestre no olho "ver como"); o mestre desenhando vê um layer de cada vez, como sempre. */
+  var cacheTelhado = { sig: "", t: null };
+  function telhados() {
+    var V = layerDaVista(), quem = vendoComo() || mapa.tokens.filter(function (tk) { return tk.personagem_id && podeMover(tk); })[0] || null;
+    var meio = quem ? celCentro(quem, quem.x, quem.y) : null, voa = !!(quem && quem.voando);
+    var sig = versaoCel + "|" + V + "|" + (meio ? meio.x + "," + meio.y : "-") + "|" + voa;
+    if (cacheTelhado.sig === sig) return cacheTelhado.t;
+    // o bloco do telhado: o mais alto acima de V num lugar que tem chão até V
+    var topo = function (x, y) {
+      var col = coluna(x, y); if (!col || col[0].L > V || col[col.length - 1].L <= V) return null;
+      return col[col.length - 1];
+    };
+    var debaixo = new Set();
+    if (meio && topo(meio.x, meio.y)) {   // pedaço coberto onde o token está: sem telhado para ele
+      var fila = [[meio.x, meio.y]]; debaixo.add(meio.x + "," + meio.y);
+      while (fila.length && debaixo.size < 20000) {
+        var at = fila.pop();
+        [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) {
+          var nx = at[0] + d[0], ny = at[1] + d[1], k = nx + "," + ny;
+          if (!debaixo.has(k) && topo(nx, ny)) { debaixo.add(k); fila.push([nx, ny]); }
+        });
+      }
+    }
+    var t = {
+      cobre: function (x, y) { return !!topo(x, y) && !debaixo.has(x + "," + y); },
+      bloco: topo,
+      // token embaixo de um telhado que quem olha não está embaixo (escondido pelo telhado)
+      esconde: function (tk) {
+        var zt = layerTk(tk), l = ladoTk(tk);
+        for (var j = 0; j < l; j++) for (var i = 0; i < l; i++) {
+          var b = topo(tk.x + i, tk.y + j);
+          if (!b || debaixo.has((tk.x + i) + "," + (tk.y + j)) || b.L <= zt) return false;
+        }
+        return true;
+      }
+    };
+    cacheTelhado = { sig: sig, t: t };
+    return t;
+  }
 
   // Converte o relevo antigo (alto/baixo) para layer: baixo = 0, mediano = 1, cima = 2.
   function lerCelula(c) {
@@ -373,7 +434,7 @@ window.DBOMapa = (function () {
     return cels;
   }
   function serializar() {
-    return { v: 2, titulo: mapa.titulo, celulas: celulasArray(), cor: mapa.cor, grade: mapa.grade, papel: mapa.papel, fundo: mapa.fundo, limite: mapa.limite, layers: faixaLayers(), recortes: mapa.recortes || null, sombras: !!mapa.sombras, caverna: !!mapa.caverna, muros: Array.from(mapa.muros.keys()), nevoa: Array.from(mapa.nevoa.keys()), textos: mapa.textos };
+    return { v: 2, titulo: mapa.titulo, celulas: celulasArray(), cor: mapa.cor, grade: mapa.grade, papel: mapa.papel, fundo: mapa.fundo, limite: mapa.limite, layers: faixaLayers(), recortes: mapa.recortes || null, sombras: !!mapa.sombras, caverna: !!mapa.caverna, semMemoria: !!mapa.semMemoria, muros: Array.from(mapa.muros.keys()), nevoa: Array.from(mapa.nevoa.keys()), textos: mapa.textos };
   }
   function aplicarDados(d) {
     mapa.titulo = d.titulo || "Mapa sem título";
@@ -386,6 +447,7 @@ window.DBOMapa = (function () {
     mapa.papel = d.papel || null;
     mapa.sombras = !!d.sombras;
     mapa.caverna = !!d.caverna;
+    mapa.semMemoria = !!d.semMemoria;
     mapa.muros = new Map((Array.isArray(d.muros) ? d.muros : []).filter(function (k) { return /^-?\d+,-?\d+,-?\d+,[hv]$/.test(k); }).map(function (k) { return [k, true]; }));
     mapa.nevoa = new Map((Array.isArray(d.nevoa) ? d.nevoa : []).filter(function (k) { return /^-?\d+,-?\d+$/.test(k); }).map(function (k) { return [k, true]; }));
     mapa.textos = (Array.isArray(d.textos) ? d.textos : []).filter(function (x) { return x && typeof x.texto === "string" && isFinite(x.x) && isFinite(x.y); }).map(function (x) {
@@ -397,11 +459,11 @@ window.DBOMapa = (function () {
   function salvar() {
     if (sessao) { if (podeEditar && opts.aoSalvarMapa) opts.aoSalvarMapa(serializar()); return; }
     try {
-      localStorage.setItem(KEY, JSON.stringify({ v: 2, titulo: mapa.titulo, celulas: celulasArray(), cor: mapa.cor, grade: mapa.grade, papel: mapa.papel, fundo: mapa.fundo, layers: faixaLayers(), sombras: !!mapa.sombras, caverna: !!mapa.caverna, muros: Array.from(mapa.muros.keys()), nevoa: Array.from(mapa.nevoa.keys()), textos: mapa.textos, tokens: mapa.tokens, vis: vis }));
+      localStorage.setItem(KEY, JSON.stringify({ v: 2, titulo: mapa.titulo, celulas: celulasArray(), cor: mapa.cor, grade: mapa.grade, papel: mapa.papel, fundo: mapa.fundo, layers: faixaLayers(), sombras: !!mapa.sombras, caverna: !!mapa.caverna, semMemoria: !!mapa.semMemoria, muros: Array.from(mapa.muros.keys()), nevoa: Array.from(mapa.nevoa.keys()), textos: mapa.textos, tokens: mapa.tokens, vis: vis }));
     } catch (e) {
       // imagem importada grande demais: salva sem ela
       try {
-        var semFundo = JSON.parse(JSON.stringify({ titulo: mapa.titulo, cor: mapa.cor, grade: mapa.grade, papel: mapa.papel, layers: faixaLayers(), sombras: !!mapa.sombras, caverna: !!mapa.caverna, muros: Array.from(mapa.muros.keys()), nevoa: Array.from(mapa.nevoa.keys()), textos: mapa.textos, tokens: mapa.tokens }));
+        var semFundo = JSON.parse(JSON.stringify({ titulo: mapa.titulo, cor: mapa.cor, grade: mapa.grade, papel: mapa.papel, layers: faixaLayers(), sombras: !!mapa.sombras, caverna: !!mapa.caverna, semMemoria: !!mapa.semMemoria, muros: Array.from(mapa.muros.keys()), nevoa: Array.from(mapa.nevoa.keys()), textos: mapa.textos, tokens: mapa.tokens }));
         semFundo.celulas = celulasArray(); semFundo.v = 2;
         localStorage.setItem(KEY, JSON.stringify(semFundo));
         if (!salvar.avisou) { salvar.avisou = true; toast("A imagem importada é grande demais para ficar salva neste navegador. O resto do mapa foi salvo."); }
@@ -576,6 +638,7 @@ window.DBOMapa = (function () {
     // Barra de ferramentas embaixo (só quem edita)
     barra = el("div", "mp-barra"); barra.setAttribute("role", "toolbar"); barra.setAttribute("aria-label", "Ferramentas do mapa");
     if (podeEditar) {
+      ferramentaBtn("mao", "Mover: arrasta a vista e os tokens, sem desenhar (Esc volta para ela)");
       relevoBtn();
       ferramentaBtn("caneta", "Caneta");
       var corBtn = el("button", "mp-ferr mp-ferr--cor"); corBtn.type = "button"; corBtn.title = "Cor"; corBtn.setAttribute("aria-label", "Cor do que você desenha");
@@ -613,15 +676,15 @@ window.DBOMapa = (function () {
       ferramentaBtn("texto", "Texto", topoF);
       raiz.appendChild(topoF);
       var eng = el("div", "mp-ferr-wrap");
-      var engBtn = el("button", "mp-ferr"); engBtn.type = "button"; engBtn.innerHTML = ICONES.engrenagem; engBtn.title = "Opções"; engBtn.setAttribute("aria-label", "Opções do mapa"); engBtn.setAttribute("aria-haspopup", "true"); engBtn.setAttribute("aria-expanded", "false");
-      var engMenu = el("div", "mp-menu mp-menu--lista"); engMenu.hidden = true;
+      var engBtn = el("button", "mp-ferr"); engBtn.type = "button"; engBtn.innerHTML = ICONES.engrenagem; engBtn.title = "Configurações do mapa"; engBtn.setAttribute("aria-label", "Configurações do mapa"); engBtn.setAttribute("aria-haspopup", "dialog");
+      var fecharCfg = function () { if (dlgCfg && dlgCfg.open) dlgCfg.close(); };
       var optGrade = el("label", "mp-menu__opt");
       var chk = el("input"); chk.type = "checkbox"; chk.checked = mapa.grade.on;
       chk.addEventListener("change", function () { mapa.grade.on = chk.checked; salvarDepois(); pedirDesenho(); });
       optGrade.appendChild(chk); optGrade.appendChild(el("span", "", "Mostrar grade"));
       var optCor = el("button", "mp-menu__opt", "Alterar cor da grade"); optCor.type = "button";
       optCor.addEventListener("click", function () {
-        engMenu.hidden = true; engBtn.setAttribute("aria-expanded", "false");
+        fecharCfg();
         DBOCor.abrir({ cor: mapa.grade.cor, titulo: "Cor da grade", aoMudar: function (c) { mapa.grade.cor = c; pedirDesenho(); }, aoEscolher: function (c) { mapa.grade.cor = c; salvarDepois(); pedirDesenho(); } });
       });
       // grossura das linhas da grade, em pixels
@@ -637,7 +700,7 @@ window.DBOMapa = (function () {
       var optPadrao = el("button", "mp-menu__opt mp-menu__opt--leve", "Fundo padrão (transparente)"); optPadrao.type = "button";
       var mostrarPapel = function () { amPapel.style.background = mapa.papel || ""; amPapel.classList.toggle("is-vazia", !mapa.papel); optPadrao.hidden = !mapa.papel; };
       optPapel.addEventListener("click", function () {
-        engMenu.hidden = true; engBtn.setAttribute("aria-expanded", "false");
+        fecharCfg();
         var antes = mapa.papel, escolheu = false;
         DBOCor.abrir({ cor: mapa.papel || PAPEL_PADRAO, titulo: "Cor do fundo do mapa",
           aoMudar: function (c) { mapa.papel = c; pedirDesenho(); },   // prévia ao vivo
@@ -656,7 +719,16 @@ window.DBOMapa = (function () {
         toast(mapa.sombras ? "Sombras ligadas: cada jogador só vê o que o próprio token enxerga (paredes e andares tapam a visão)." : "Sombras desligadas: todos veem o mapa inteiro.");
       });
       optSombra.appendChild(chkS); optSombra.appendChild(el("span", "", "Sombras (visão dos jogadores)"));
-      engMenu.appendChild(optSombra);
+      // Memória (com sombras): o que o token já viu fica à mostra, mais apagado, sem mostrar quem está lá
+      var optMem = el("label", "mp-menu__opt");
+      var chkM = el("input"); chkM.type = "checkbox"; chkM.checked = !mapa.semMemoria;
+      chkM.addEventListener("change", function () {
+        mapa.semMemoria = !chkM.checked; salvarDepois(); pedirDesenho();
+        toast(chkM.checked ? "Os lugares por onde o jogador já passou ficam à mostra, mais apagados (sem mostrar quem está lá)." : "Sem memória: o que o token não vê agora fica escuro.");
+      });
+      optMem.appendChild(chkM); optMem.appendChild(el("span", "", "Lembrar lugares já vistos"));
+      var optReguasM = el("button", "mp-menu__opt", "Apagar as réguas fixas"); optReguasM.type = "button";
+      optReguasM.addEventListener("click", function () { fecharCfg(); reguasFixas = []; pedirDesenho(); toast("Réguas apagadas."); });
       var optCav = el("label", "mp-menu__opt");
       var chkC = el("input"); chkC.type = "checkbox"; chkC.checked = !!mapa.caverna;
       chkC.addEventListener("change", function () {
@@ -664,11 +736,14 @@ window.DBOMapa = (function () {
         toast(mapa.caverna ? "Modo caverna: tudo escuro; cada token enxerga 2 × (Concentração + 1) blocos em volta. Tocha e lanterna ficam nas ações do token." : "Modo caverna desligado.");
       });
       optCav.appendChild(chkC); optCav.appendChild(el("span", "", "Modo caverna (escuro)"));
-      engMenu.appendChild(optCav);
-      engMenu.appendChild(optGrade); engMenu.appendChild(optCor); engMenu.appendChild(optEsp); engMenu.appendChild(optPapel); engMenu.appendChild(optPadrao);
-      engBtn.addEventListener("click", function () { engMenu.hidden = !engMenu.hidden; engBtn.setAttribute("aria-expanded", String(!engMenu.hidden)); });
-      ouvir(document, "click", function (e) { if (!eng.contains(e.target)) { engMenu.hidden = true; engBtn.setAttribute("aria-expanded", "false"); } });
-      eng.appendChild(engMenu); eng.appendChild(engBtn);
+      var gruposCfg = [
+        ["Visão dos jogadores", [[optSombra, "sombra visao escuro"], [optMem, "memoria lembrar lugares vistos explorado"], [optCav, "caverna escuro tocha lanterna"]]],
+        ["Grade", [[optGrade, "grade linhas mostrar"], [optCor, "grade cor"], [optEsp, "grade grossura espessura linha"]]],
+        ["Fundo", [[optPapel, "fundo papel cor vazio"], [optPadrao, "fundo padrao transparente"]]],
+        ["Régua", [[optReguasM, "regua apagar fixas medir"]]]
+      ];
+      engBtn.addEventListener("click", function () { optReguasM.hidden = !reguasFixas.length; mostrarPapel(); chkS.checked = !!mapa.sombras; chkC.checked = !!mapa.caverna; chkM.checked = !mapa.semMemoria; chk.checked = mapa.grade.on; abrirConfig("Configurações do mapa", gruposCfg, engBtn); });
+      eng.appendChild(engBtn);
       barra.appendChild(eng);
       if (sessao) olhoBtn();
       raiz.appendChild(barra);
@@ -679,8 +754,8 @@ window.DBOMapa = (function () {
       ferramentaBtn("regua", "Régua: distância em metros");
       // opções do jogador: só a cor da borda do próprio token
       var engJ = el("div", "mp-ferr-wrap");
-      var engJBtn = el("button", "mp-ferr"); engJBtn.type = "button"; engJBtn.innerHTML = ICONES.engrenagem; engJBtn.title = "Opções"; engJBtn.setAttribute("aria-label", "Opções do seu token"); engJBtn.setAttribute("aria-haspopup", "true"); engJBtn.setAttribute("aria-expanded", "false");
-      var engJMenu = el("div", "mp-menu mp-menu--lista"); engJMenu.hidden = true;
+      var engJBtn = el("button", "mp-ferr"); engJBtn.type = "button"; engJBtn.innerHTML = ICONES.engrenagem; engJBtn.title = "Configurações"; engJBtn.setAttribute("aria-label", "Configurações do mapa e do seu token"); engJBtn.setAttribute("aria-haspopup", "dialog");
+      var fecharCfgJ = function () { if (dlgCfg && dlgCfg.open) dlgCfg.close(); };
       var meuToken = function () { return mapa.tokens.filter(function (tk) { return tk.personagem_id && podeMover(tk); })[0] || null; };
       var optBorda = el("button", "mp-menu__opt", "Cor da borda do meu token"); optBorda.type = "button";
       var amBorda = el("span", "mp-menu__amostra"); optBorda.insertBefore(amBorda, optBorda.firstChild);
@@ -688,7 +763,7 @@ window.DBOMapa = (function () {
       var mostrarBorda = function () { var tk = meuToken(), c = tk && tk.borda; amBorda.style.background = c || "linear-gradient(135deg, #FBFCFD, #A7AEB7 40%, #EEF1F4 55%, #7C848E)"; optPrata.hidden = !c; };
       var salvarBorda = function (c) { var tk = meuToken(); if (!tk) return; tk.borda = c; mostrarBorda(); pedirDesenho(); tokenMudou(tk); };
       optBorda.addEventListener("click", function () {
-        engJMenu.hidden = true; engJBtn.setAttribute("aria-expanded", "false");
+        fecharCfgJ();
         var tk = meuToken();
         if (!tk) return toast("Ponha seu personagem no mapa primeiro (arraste da lista da direita).");
         var antes = tk.borda || null, escolheu = false;
@@ -702,14 +777,17 @@ window.DBOMapa = (function () {
       var optGotas = el("button", "mp-menu__opt", "Copiar a cor de um bloco"); optGotas.type = "button";
       var icG = el("span", "mp-menu__icone"); icG.innerHTML = ICONES.gotas; optGotas.insertBefore(icG, optGotas.firstChild);
       optGotas.addEventListener("click", function () {
-        engJMenu.hidden = true; engJBtn.setAttribute("aria-expanded", "false");
+        fecharCfgJ();
         if (!meuToken()) return toast("Ponha seu personagem no mapa primeiro (arraste da lista da direita).");
         contaGotas(function (c) { salvarBorda(c); toast("Borda do seu token: " + c + "."); });
       });
-      engJMenu.appendChild(optBorda); engJMenu.appendChild(optGotas); engJMenu.appendChild(optPrata);
-      engJBtn.addEventListener("click", function () { mostrarBorda(); engJMenu.hidden = !engJMenu.hidden; engJBtn.setAttribute("aria-expanded", String(!engJMenu.hidden)); });
-      ouvir(document, "click", function (e) { if (!engJ.contains(e.target)) { engJMenu.hidden = true; engJBtn.setAttribute("aria-expanded", "false"); } });
-      engJ.appendChild(engJMenu); engJ.appendChild(engJBtn);
+      // réguas fixas: apagar todas de uma vez
+      var optReguas = el("button", "mp-menu__opt", "Apagar as réguas fixas"); optReguas.type = "button";
+      optReguas.addEventListener("click", function () { fecharCfgJ(); reguasFixas = []; pedirDesenho(); toast("Réguas apagadas."); });
+      var gruposJ = [["Seu token", [[optBorda, "borda cor token"], [optGotas, "copiar cor bloco conta gotas borda"], [optPrata, "borda prateada padrao"]]],
+        ["Régua", [[optReguas, "regua apagar fixas medir"]]]];
+      engJBtn.addEventListener("click", function () { mostrarBorda(); optReguas.hidden = !reguasFixas.length; abrirConfig("Configurações", gruposJ, engJBtn); });
+      engJ.appendChild(engJBtn);
       barra.appendChild(engJ);
       raiz.appendChild(barra);
     }
@@ -748,6 +826,50 @@ window.DBOMapa = (function () {
     atualizarBarra();
     if (window.ResizeObserver) { var ro = new ResizeObserver(function () { redimensionar(); }); ro.observe(raiz); globais.push([ro]); }
     else ouvir(window, "resize", redimensionar);
+  }
+
+  /* ---------- Configurações (engrenagem): pop-up com busca, para o mestre e para o jogador ----------
+     grupos: [[título, [[nó da opção, palavras extras para a busca], ...]], ...]. Os nós são os mesmos de sempre (as
+     opções continuam funcionando igual); a busca esconde o que não combina e os grupos que ficaram vazios. */
+  var dlgCfg = null;
+  function semAcento(t) { return String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+  function abrirConfig(titulo, grupos, botao) {
+    if (!dlgCfg) {
+      dlgCfg = el("dialog", "modal mp-config"); dlgCfg.setAttribute("aria-labelledby", "mpcfg-t");
+      document.body.appendChild(dlgCfg);
+      dlgCfg.addEventListener("click", function (e) { if (e.target === dlgCfg) dlgCfg.close(); });   // clique fora fecha
+    }
+    var d = dlgCfg; d.textContent = "";
+    var x = el("button", "modal__close", "×"); x.type = "button"; x.setAttribute("aria-label", "Fechar"); x.addEventListener("click", function () { d.close(); });
+    d.appendChild(x);
+    var h = el("h2", "", titulo); h.id = "mpcfg-t"; d.appendChild(h);
+    var busca = el("input", "mp-config__busca"); busca.type = "search"; busca.placeholder = "Pesquisar uma opção…"; busca.setAttribute("aria-label", "Pesquisar uma opção");
+    d.appendChild(busca);
+    var corpo = el("div", "mp-config__corpo"), nada = el("p", "mp-config__nada", "Nenhuma opção com esse nome."); nada.hidden = true;
+    var blocos = grupos.map(function (gr) {
+      var sec = el("section", "mp-config__grupo"); sec.appendChild(el("h3", "", gr[0]));
+      var itens = gr[1].map(function (it) { sec.appendChild(it[0]); return { no: it[0], txt: semAcento(gr[0] + " " + it[0].textContent + " " + (it[1] || "")) }; });
+      corpo.appendChild(sec);
+      return { sec: sec, itens: itens };
+    });
+    d.appendChild(corpo); d.appendChild(nada);
+    var filtrar = function () {
+      var q = semAcento(busca.value).trim().split(/\s+/).filter(Boolean), algum = false;
+      blocos.forEach(function (b) {
+        var vis = 0;
+        b.itens.forEach(function (it) {
+          var bate = q.every(function (p) { return it.txt.indexOf(p) >= 0; });
+          it.no.classList.toggle("is-fora", !bate);
+          if (bate && !it.no.hidden) vis++;
+        });
+        b.sec.hidden = !vis; if (vis) algum = true;
+      });
+      nada.hidden = algum;
+    };
+    busca.addEventListener("input", filtrar);
+    d.addEventListener("close", function volta() { d.removeEventListener("close", volta); if (botao && botao.isConnected) botao.focus({ preventScroll: true }); });
+    filtrar();
+    d.showModal(); busca.focus();
   }
 
   /* ---------- Olho (mestre na Sessão): ver o mapa como um jogador ou NPC vê ---------- */
@@ -949,7 +1071,7 @@ window.DBOMapa = (function () {
     if (id === "nevoa" && !selNevoa) comecarNevoa();
     if (id === "texto") toast(ui.sub.texto === "corrido" ? "Texto corrido: clique onde ele vai ficar escrito." : "Etiqueta: clique no bloco onde ela vai ficar escondida.");
     salvarUi();
-    if (id !== "regua") { regua.ini = null; dica.hidden = true; }
+    if (id !== "regua") { regua.ini = null; regua.fim = null; reguaPega = null; reguaPress = null; dica.hidden = true; }
     atualizarBarra(); pedirDesenho();
   }
   // A cor do botão de cor vale para o tipo que a ferramenta desenha (espaço ou parede).
@@ -1050,6 +1172,11 @@ window.DBOMapa = (function () {
 
   /* ---------- Desenho ---------- */
   var pendente = false, previa = null, arrasto = null, regua = { ini: null, fim: null }, bordaHover = null;
+  /* Régua: o 1º clique começa (dentro do token, se clicar num), ela acompanha o mouse; o 2º clique — ou soltar depois de
+     arrastar — fixa nesses dois blocos. Réguas fixas ficam na tela com qualquer ferramenta. Com a régua, clicar numa
+     régua fixa solta ela de novo (acompanha o mouse; outro clique fixa em outro lugar, Esc apaga). Com a régua escolhida,
+     os tokens não são arrastados. As réguas fixas são só de quem mediu (não vão para os outros). */
+  var reguasFixas = [], reguaPega = null, reguaPress = null;
   var soltando = null;   // Sessão: personagem sendo arrastado da lista ({ x, y, ok, token })
   function pedirDesenho() { if (!pendente) { pendente = true; requestAnimationFrame(desenhar); } }
   // número "aleatório" fixo por bloco (para a terra ter manchas sempre no mesmo lugar)
@@ -1072,8 +1199,13 @@ window.DBOMapa = (function () {
     if (d > 0) { g.fillStyle = "rgba(255, 255, 255, " + Math.min(.38, .16 + .07 * (d - 1)) + ")"; g.fillRect(px, py, t, t); }
     else if (d < 0) { g.fillStyle = "rgba(0, 0, 0, " + Math.min(.6, .2 * -d) + ")"; g.fillRect(px, py, t, t); }
     if (t < 8) return;
+    if (escadaLiga(x, y, L)) return;   // a própria escada (ou o topo dela): sem beirada, ela é a passagem
     var b = Math.max(2, t * .15);
-    var viz = function (nx, ny) { var l = layerVisivel(nx, ny, V); return l == null ? 1 : l; };
+    var viz = function (nx, ny) {
+      var bv = blocoVisivel(nx, ny, V);
+      if (bv && ehEscada(bv.v) && (bv.L === L || bv.L === L - 1)) return L;   // vizinho escada: sem beirada desse lado
+      return bv ? bv.L : 1;
+    };
     var cima = viz(x, y - 1), baixo = viz(x, y + 1), esq = viz(x - 1, y), dir = viz(x + 1, y);
     if (cima < L) { g.fillStyle = "rgba(255, 255, 255, .45)"; g.fillRect(px, py, t, b); } else if (cima > L) { g.fillStyle = "rgba(0, 0, 0, .34)"; g.fillRect(px, py, t, b * 1.2); }
     if (esq < L) { g.fillStyle = "rgba(255, 255, 255, .3)"; g.fillRect(px, py, b, t); } else if (esq > L) { g.fillStyle = "rgba(0, 0, 0, .24)"; g.fillRect(px, py, b, t); }
@@ -1174,6 +1306,7 @@ window.DBOMapa = (function () {
     // espaço e terra primeiro; a grade passa por cima deles; as paredes vêm depois, inteiras (sem a grade cortando)
     // em cada lugar aparece o bloco que quem olha (layer V) enxerga: o mais alto até V, ou o terreno alto acima
     var paredes = [], V = o.V == null ? layerDaVista() : o.V, soAte = o.soAte == null ? !vistaDeJogador() : o.soAte;
+    var telhado = o.V == null && vistaDeJogador() ? telhados() : null;
     var marcas = o.marcas === false ? null : new Map();   // escadas que sobem / descem a partir de V (setinhas)
     var desenhados = [];   // [x, y, cor] dos blocos pintados (para a borda fina em volta deles)
     var vistos = new Map();
@@ -1189,7 +1322,20 @@ window.DBOMapa = (function () {
       if (b.v.t === "parede") { paredes.push([p.x, p.y, b.v, b.L]); return; }
       // escada que chega aqui de baixo (topo dela = V): aparece clara, como parte deste andar
       var topo = ehEscada(b.v) && b.L === V - 1;
+      if (telhado && telhado.cobre(p.x, p.y)) {   // telhado: quem está fora vê o bloco de cima, mais escuro (coberto)
+        var tt = telhado.bloco(p.x, p.y), tpx = Math.floor(o.ox + p.x * t), tpy = Math.floor(o.oy + p.y * t);
+        if (tt.v.t === "parede") { paredes.push([p.x, p.y, tt.v, tt.L, true]); return; }
+        pintarCelula(g, p.x, p.y, tt.v, t, tpx, tpy, tt.L, tt.L);
+        g.fillStyle = "rgba(14, 16, 32, .38)"; g.fillRect(tpx, tpy, t, t);
+        desenhados.push([p.x, p.y, tt.v.t === "terra" ? "#7A5634" : tt.v.c]);
+        return;
+      }
       pintarCelula(g, p.x, p.y, b.v, t, Math.floor(o.ox + p.x * t), Math.floor(o.oy + p.y * t), topo ? V : b.L, V);
+      var escBaixo = !topo && b.L === V && b.v.t !== "parede" && !ehEscada(b.v) && ehEscada(blocoEm(p.x, p.y, V - 1));
+      if (escBaixo) {   // tem chão em cima da escada: ela aparece de leve, para mostrar de onde se desce
+        g.globalAlpha = .55; pintarEscada(g, p.x, p.y, blocoEm(p.x, p.y, V - 1), t, Math.floor(o.ox + p.x * t), Math.floor(o.oy + p.y * t)); g.globalAlpha = 1;
+        if (marcas) marcas.set(kk, "desce");
+      }
       desenhados.push([p.x, p.y, b.v.t === "terra" ? "#7A5634" : b.v.c]);
       if (marcas && ehEscada(b.v) && (b.L === V || topo)) marcas.set(kk, b.L === V ? "sobe" : "desce");
     });
@@ -1207,7 +1353,11 @@ window.DBOMapa = (function () {
       for (var y = o.y0; y <= o.y1; y++) { var Y = Math.round(o.oy + y * t) + meio; g.moveTo(o.ox + o.x0 * t, Y); g.lineTo(o.ox + o.x1 * t, Y); }
       g.stroke();
     }
-    paredes.forEach(function (p) { pintarCelula(g, p[0], p[1], p[2], t, Math.floor(o.ox + p[0] * t), Math.floor(o.oy + p[1] * t), p[3], V); });
+    paredes.forEach(function (p) {
+      var ppx = Math.floor(o.ox + p[0] * t), ppy = Math.floor(o.oy + p[1] * t);
+      pintarCelula(g, p[0], p[1], p[2], t, ppx, ppy, p[3], p[4] ? p[3] : V);
+      if (p[4]) { g.fillStyle = "rgba(14, 16, 32, .38)"; g.fillRect(ppx, ppy, t + 1, t + 1); }   // parede de telhado
+    });
     desenharMuros(g, o, t, V, desenhados, soAte);
     if (marcas && marcas.size && t >= 10) setasDeEscada(g, marcas, t, o);
   }
@@ -1231,6 +1381,7 @@ window.DBOMapa = (function () {
       var ax = hor ? x : x - 1, ay = hor ? y - 1 : y;
       var la = layerVisivel(x, y, V), lb = layerVisivel(ax, ay, V);
       if (L > V || (la !== L && lb !== L)) return;   // só a parede do andar que aparece
+      if (!muroFino(k)) return;                      // encostada numa escada: não existe
       var b = blocoVisivel(x, y, V) || blocoVisivel(ax, ay, V), cor = b ? (b.v.t === "terra" ? "#7A5634" : b.v.c) : mapa.cor;
       var px = o.ox + x * t, py = o.oy + y * t;
       g.strokeStyle = corParede(cor); g.lineWidth = em;
@@ -1331,31 +1482,9 @@ window.DBOMapa = (function () {
       g.stroke(); g.setLineDash([]);
       g.fillStyle = "#E0642C"; g.beginPath(); g.arc(ex0, ey0, Math.max(4, t * .16), 0, Math.PI * 2); g.fill();
     }
-    // régua
-    if (regua.ini) {
-      var cx0 = vis.ox + (regua.ini.x + .5) * t, cy0 = vis.oy + (regua.ini.y + .5) * t;
-      g.fillStyle = "rgba(224, 69, 90, .25)"; g.fillRect(vis.ox + regua.ini.x * t, vis.oy + regua.ini.y * t, t, t);
-      if (regua.fim && ui.sub.regua !== "linha") {
-        // área do cone ou do círculo: blocos pintados de leve e o contorno exato da forma
-        g.fillStyle = "rgba(224, 69, 90, .2)";
-        blocosDaRegua().forEach(function (p) { g.fillRect(vis.ox + p[0] * t, vis.oy + p[1] * t, t, t); });
-        var R = Math.hypot(regua.fim.x - regua.ini.x, regua.fim.y - regua.ini.y) * t;
-        g.strokeStyle = "#E0455A"; g.lineWidth = 2.5; g.fillStyle = "rgba(224, 69, 90, .12)";
-        g.beginPath();
-        if (ui.sub.regua === "circulo") g.arc(cx0, cy0, R, 0, Math.PI * 2);
-        else { var dir = Math.atan2(regua.fim.y - regua.ini.y, regua.fim.x - regua.ini.x), meia = ui.angulo / 2 * Math.PI / 180; g.moveTo(cx0, cy0); g.arc(cx0, cy0, R, dir - meia, dir + meia); g.closePath(); }
-        g.fill(); g.stroke();
-        var cxm = vis.ox + (regua.fim.x + .5) * t, cym = vis.oy + (regua.fim.y + .5) * t;
-        g.setLineDash([6, 4]); g.lineWidth = 1.5; g.beginPath(); g.moveTo(cx0, cy0); g.lineTo(cxm, cym); g.stroke(); g.setLineDash([]);
-      } else if (regua.fim) {
-        var cx1 = vis.ox + (regua.fim.x + .5) * t, cy1 = vis.oy + (regua.fim.y + .5) * t;
-        g.fillRect(vis.ox + regua.fim.x * t, vis.oy + regua.fim.y * t, t, t);
-        g.strokeStyle = "#E0455A"; g.lineWidth = 3; g.setLineDash([8, 5]);
-        g.beginPath(); g.moveTo(cx0, cy0); g.lineTo(cx1, cy1); g.stroke(); g.setLineDash([]);
-      }
-      g.fillStyle = "#E0455A"; g.beginPath(); g.arc(cx0, cy0, Math.max(5, t * .2), 0, Math.PI * 2); g.fill();
-      g.strokeStyle = "#fff"; g.lineWidth = 2; g.stroke();
-    }
+    // réguas fixas (com qualquer ferramenta) e a régua na mão
+    reguasFixas.forEach(function (r) { desenharRegua(g, r, t, true); });
+    var rm = reguaNaMao(); if (rm) desenharRegua(g, rm, t, false);
     var sonares = [];   // Sensor de Presença: tokens escondidos perto de quem olha pulsam em vermelho
     // tokens (o que está sendo arrastado vai por último, com a sombra no bloco onde vai pousar)
     // os maiores primeiro: os pequenos ficam por cima
@@ -1499,6 +1628,7 @@ window.DBOMapa = (function () {
     for (var y = c.y0; y <= c.y1; y++) for (var x = c.x0; x <= c.x1; x++) if (esta(x, y)) dentro[chave(x, y)] = true;
     // "borda": espaço com paredes finas em volta · "cheio": só as paredes finas (o contorno da forma)
     var espaco = espacoNovo(), muros = [];
+    if (ehEscada(espaco) && sub !== "vazio") sub = "vazio";   // escada não ganha paredes em volta (nem vira só paredes)
     Object.keys(dentro).forEach(function (k) {
       var p = k.split(","), x = +p[0], y = +p[1];
       if (sub !== "cheio") out.set(k, espaco);
@@ -1579,16 +1709,63 @@ window.DBOMapa = (function () {
     var r = raio(a, b);
     return tipo === "cone" ? "Cone de " + medida(r) + " · " + ang + "°" : "Raio de " + medida(r);
   }
-  function textoRegua() {
-    var a = regua.ini, b = regua.fim || regua.ini, tipo = ui.sub.regua;
-    if (tipo === "cone") return textoArea(a, b, "cone", ui.angulo);
-    if (tipo === "circulo") return textoArea(a, b, "circulo", ui.angulo);
-    return medida(distancia(a, b));
+  // Régua que está na mão (segue o mouse) no formato das fixas: { ini, fim, tipo, ang }
+  function reguaNaMao() { return regua.ini ? { ini: regua.ini, fim: regua.fim || regua.ini, tipo: ui.sub.regua, ang: ui.angulo } : null; }
+  function textoDaRegua(r) {
+    if (r.tipo === "cone" || r.tipo === "circulo") return textoArea(r.ini, r.fim, r.tipo, r.ang);
+    return medida(distancia(r.ini, r.fim));
   }
+  function textoRegua() { var r = reguaNaMao(); return r ? textoDaRegua(r) : ""; }
   // Blocos que a área do cone ou do círculo pega (centro do bloco dentro da forma).
-  function blocosDaRegua() {
-    if (!regua.ini || !regua.fim || ui.sub.regua === "linha") return [];
-    return blocosArea(regua.ini, regua.fim, ui.sub.regua, ui.angulo);
+  function blocosDaReguaDe(r) { return !r || r.tipo === "linha" ? [] : blocosArea(r.ini, r.fim, r.tipo, r.ang); }
+  // Régua fixa embaixo do ponto da tela (perto da linha entre os dois blocos, ou de uma das pontas): índice ou -1.
+  function reguaFixaEm(px, py) {
+    var m = telaParaMundo(px, py), melhor = -1, dm = .45;
+    reguasFixas.forEach(function (r, i) {
+      var ax = r.ini.x + .5, ay = r.ini.y + .5, bx = r.fim.x + .5, by = r.fim.y + .5, vx = bx - ax, vy = by - ay, L2 = vx * vx + vy * vy;
+      var u = L2 ? Math.max(0, Math.min(1, ((m.x - ax) * vx + (m.y - ay) * vy) / L2)) : 0;
+      var d = Math.hypot(m.x - (ax + u * vx), m.y - (ay + u * vy));
+      if (d < dm) { dm = d; melhor = i; }
+    });
+    return melhor;
+  }
+  function fixarRegua(fim) {
+    if (!regua.ini) return;
+    var r = { ini: regua.ini, fim: fim || regua.fim || regua.ini, tipo: ui.sub.regua, ang: ui.angulo };
+    regua.ini = null; regua.fim = null; reguaPega = null; reguaPress = null; dica.hidden = true;
+    if (r.ini.x === r.fim.x && r.ini.y === r.fim.y) return pedirDesenho();   // régua de tamanho zero não fica
+    reguasFixas.push(r); pedirDesenho();
+  }
+  // Desenha uma régua (na mão ou fixa). fixa: traço mais fino e a medida sempre escrita no meio.
+  function desenharRegua(g, r, t, fixa) {
+    var cx0 = vis.ox + (r.ini.x + .5) * t, cy0 = vis.oy + (r.ini.y + .5) * t, cx1 = vis.ox + (r.fim.x + .5) * t, cy1 = vis.oy + (r.fim.y + .5) * t;
+    var cor = fixa ? "#C2185B" : "#E0455A";
+    g.fillStyle = fixa ? "rgba(194, 24, 91, .18)" : "rgba(224, 69, 90, .25)"; g.fillRect(vis.ox + r.ini.x * t, vis.oy + r.ini.y * t, t, t);
+    if (r.tipo !== "linha") {
+      g.fillStyle = fixa ? "rgba(194, 24, 91, .14)" : "rgba(224, 69, 90, .2)";
+      blocosDaReguaDe(r).forEach(function (p) { g.fillRect(vis.ox + p[0] * t, vis.oy + p[1] * t, t, t); });
+      var R = Math.hypot(r.fim.x - r.ini.x, r.fim.y - r.ini.y) * t;
+      g.strokeStyle = cor; g.lineWidth = fixa ? 2 : 2.5; g.fillStyle = "rgba(224, 69, 90, .1)";
+      g.beginPath();
+      if (r.tipo === "circulo") g.arc(cx0, cy0, R, 0, Math.PI * 2);
+      else { var dir = Math.atan2(r.fim.y - r.ini.y, r.fim.x - r.ini.x), meia = r.ang / 2 * Math.PI / 180; g.moveTo(cx0, cy0); g.arc(cx0, cy0, R, dir - meia, dir + meia); g.closePath(); }
+      g.fill(); g.stroke();
+      g.setLineDash([6, 4]); g.lineWidth = 1.5; g.beginPath(); g.moveTo(cx0, cy0); g.lineTo(cx1, cy1); g.stroke(); g.setLineDash([]);
+    } else {
+      g.fillRect(vis.ox + r.fim.x * t, vis.oy + r.fim.y * t, t, t);
+      g.strokeStyle = cor; g.lineWidth = fixa ? 2.5 : 3; g.setLineDash([8, 5]);
+      g.beginPath(); g.moveTo(cx0, cy0); g.lineTo(cx1, cy1); g.stroke(); g.setLineDash([]);
+    }
+    g.fillStyle = cor; g.beginPath(); g.arc(cx0, cy0, Math.max(5, t * .2), 0, Math.PI * 2); g.fill();
+    g.strokeStyle = "#fff"; g.lineWidth = 2; g.stroke();
+    if (fixa) {   // ponta e medida escrita no meio da linha
+      g.fillStyle = cor; g.beginPath(); g.arc(cx1, cy1, Math.max(4, t * .14), 0, Math.PI * 2); g.fill(); g.stroke();
+      var txt = textoDaRegua(r), mx = (cx0 + cx1) / 2, my = (cy0 + cy1) / 2;
+      g.font = "700 12px " + (getComputedStyle(raiz).fontFamily || "sans-serif"); g.textAlign = "center"; g.textBaseline = "middle";
+      var w = g.measureText(txt).width + 14;
+      g.fillStyle = "rgba(21, 26, 58, .88)"; g.beginPath(); if (g.roundRect) g.roundRect(mx - w / 2, my - 11, w, 22, 11); else g.rect(mx - w / 2, my - 11, w, 22); g.fill();
+      g.fillStyle = "#fff"; g.fillText(txt, mx, my + .5);
+    }
   }
   // Blocos de um cone (com ângulo) ou círculo saindo de a até b. Serve à régua e à explosão.
   function blocosArea(a, b, tipo, angulo) {
@@ -1744,6 +1921,16 @@ window.DBOMapa = (function () {
     }
     return z;
   }
+  // Token que aparece para quem olha, embaixo do mouse (qualquer um: a régua começa nele).
+  function tokenVisivelEm(px, py) {
+    var m = telaParaMundo(px, py);
+    for (var i = mapa.tokens.length - 1; i >= 0; i--) {
+      var tk = mapa.tokens[i], c = centroTk(tk, tk.x, tk.y), dx = m.x - c.x, dy = m.y - c.y, r = Math.max(.3, .45 * escalaTk(tk));
+      if (!tokenAparece(tk)) continue;
+      if (dx * dx + dy * dy <= r * r) return tk;
+    }
+    return null;
+  }
   // Token embaixo do mouse que esta pessoa pode mover (na Sessão o jogador só pega o próprio).
   function tokenEm(px, py) {
     var m = telaParaMundo(px, py);
@@ -1823,8 +2010,7 @@ window.DBOMapa = (function () {
   // Parede fina (ou a borda dos blocos) entre dois vizinhos, na altura h: a fina ocupa a altura do layer dela; a da borda vai
   // até o alto do bloco mais alto do lado desenhado.
   function muroTapa(ax, ay, bx, by, h) {
-    var k = muroK(ax, ay, bx, by, Math.floor(h));
-    if (k && mapa.muros.has(k)) return true;
+    if (muroFino(muroK(ax, ay, bx, by, Math.floor(h)))) return true;
     if (!bordaDoVazio(ax, ay, bx, by)) return false;
     var col = coluna(ax, ay) || coluna(bx, by);
     return h < col[col.length - 1].L + 1;
@@ -1894,23 +2080,61 @@ window.DBOMapa = (function () {
       mapa.tokens.map(function (t) { return t.id + ":" + t.x + "," + t.y + "," + layerTk(t) + "," + ladoTk(t); }).join(";");
     if (sig === visao.sig) return visao;
     if (visao.vistos && arrasto && arrasto.tipo === "pintar") return visao;   // pintando: refaz quando soltar
-    var vistos = new Set(), tokens = new Set();
+    var vistos = new Set(), tokens = new Set(), lembra = !mapa.semMemoria;
+    if (lembra) carregarMemoria();
     os.forEach(function (o) {
       var bx0 = Math.max(A.x0, Math.floor(o.x - o.alcance)), bx1 = Math.min(A.x1, Math.ceil(o.x + o.alcance));
       var by0 = Math.max(A.y0, Math.floor(o.y - o.alcance)), by1 = Math.min(A.y1, Math.ceil(o.y + o.alcance));
+      var mem = lembra ? (memoria.porToken[o.tk.id] || (memoria.porToken[o.tk.id] = new Set())) : null, antes = mem ? mem.size : 0;
       for (var y = by0; y < by1; y++) for (var x = bx0; x < bx1; x++) {
         var k = x + "," + y;
-        if (!vistos.has(k) && blocoVisto(o, x, y)) vistos.add(k);
+        if ((vistos.has(k) && !mem) || (mem && vistos.has(k) && mem.has(k))) continue;
+        if (blocoVisto(o, x, y)) { vistos.add(k); if (mem) mem.add(k); }
       }
+      if (mem && mem.size !== antes) guardarMemoria();
       mapa.tokens.forEach(function (tk) { if (!tokens.has(tk.id) && tokenVistoPor(o, tk)) tokens.add(tk.id); });
     });
     visao = { sig: sig, vistos: vistos, tokens: tokens, olhos: os };
     return visao;
   }
+  /* Memória (com sombras ligadas e "Lembrar lugares já vistos" na engrenagem): tudo o que cada token já viu fica
+     guardado neste navegador (por mapa). Para o jogador, esses lugares aparecem mais apagados quando o token sai de perto:
+     ele sabe como o lugar é, mas não vê o que nem quem está lá agora. */
+  var MEM_KEY = "dbo-mapa-memoria", memoria = { id: null, porToken: {} }, memoriaT = null;
+  function idMemoria() { var L = mapa.limite; return (sessao ? "s|" : "e|") + mapa.titulo + "|" + (L ? [L.x0, L.y0, L.x1, L.y1].join(",") : ""); }
+  function carregarMemoria() {
+    var id = idMemoria(); if (memoria.id === id) return;
+    memoria = { id: id, porToken: {} };
+    try {
+      var tudo = JSON.parse(localStorage.getItem(MEM_KEY)) || {}, d = tudo[id] || {};
+      Object.keys(d).forEach(function (tk) { memoria.porToken[tk] = new Set(String(d[tk] || "").split(";").filter(Boolean)); });
+    } catch (e) {}
+  }
+  function guardarMemoria() {
+    clearTimeout(memoriaT);
+    memoriaT = setTimeout(function () {
+      try {
+        var tudo = JSON.parse(localStorage.getItem(MEM_KEY)) || {}, d = {};
+        Object.keys(memoria.porToken).forEach(function (tk) { d[tk] = Array.from(memoria.porToken[tk]).join(";"); });
+        tudo[memoria.id] = d; d._em = Date.now();
+        var ids = Object.keys(tudo);   // guarda só os 12 mapas mais recentes
+        if (ids.length > 12) ids.sort(function (a, b) { return ((tudo[a] || {})._em || 0) - ((tudo[b] || {})._em || 0); }).slice(0, ids.length - 12).forEach(function (k) { delete tudo[k]; });
+        localStorage.setItem(MEM_KEY, JSON.stringify(tudo));
+      } catch (e) { /* sem espaço no navegador: a memória vale só até recarregar a página */ }
+    }, 800);
+  }
+  // Lugares que quem olha agora já viu antes (jogador: o próprio token; mestre no olho: o token escolhido).
+  function lembradosDe(v) {
+    if (mapa.semMemoria || !v || !v.olhos) return null;
+    var s = new Set();
+    v.olhos.forEach(function (o) { var m = memoria.porToken[o.tk.id]; if (m) m.forEach(function (k) { s.add(k); }); });
+    return s.size ? s : null;
+  }
   // Para quem olha agora: o token aparece? (o jogador não vê o que o token dele não vê)
   function tokenAparece(tk) {
     if (!vistaDeJogador()) return true;
     if (!tokenNaNevoaVisto(tk)) return false;
+    if (sessao && !(vendoComo() === tk || (podeMover(tk) && !podeEditar)) && telhados().esconde(tk)) return false;   // coberto por um telhado
     if (!sombrasLigadas()) return true;
     var v = visaoAtual(); return !v || v.tokens.has(tk.id);
   }
@@ -1932,15 +2156,21 @@ window.DBOMapa = (function () {
         g.fillStyle = gr; g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, o.cone.len * t, o.cone.dir - o.cone.meia, o.cone.dir + o.cone.meia); g.closePath(); g.fill();
       }
     });
-    g.fillStyle = jog ? "#090B18" : "rgba(17, 22, 44, .3)";
-    for (var y = faixa.y0; y < faixa.y1; y++) {
-      var corrida = null;   // junta blocos seguidos da mesma linha num retângulo só
-      for (var x = faixa.x0; x <= faixa.x1; x++) {
-        var escuro = x < faixa.x1 && !v.vistos.has(x + "," + y);
-        if (escuro && corrida == null) corrida = x;
-        if (!escuro && corrida != null) { g.fillRect(Math.floor(vis.ox + corrida * t), Math.floor(vis.oy + y * t), Math.ceil((x - corrida) * t) + 1, Math.ceil(t) + 1); corrida = null; }
+    // escuro: 2 = nunca visto · 1 = já visto antes (memória, só para o jogador) · 0 = visto agora
+    var lem = jog ? lembradosDe(v) : null;
+    var nivel = function (x, y) { var k = x + "," + y; return v.vistos.has(k) ? 0 : lem && lem.has(k) ? 1 : 2; };
+    [[2, jog ? "#090B18" : "rgba(17, 22, 44, .3)"], [1, "rgba(9, 11, 24, .62)"]].forEach(function (par) {
+      if (par[0] === 1 && !lem) return;
+      g.fillStyle = par[1];
+      for (var y = faixa.y0; y < faixa.y1; y++) {
+        var corrida = null;   // junta blocos seguidos da mesma linha num retângulo só
+        for (var x = faixa.x0; x <= faixa.x1; x++) {
+          var escuro = x < faixa.x1 && nivel(x, y) === par[0];
+          if (escuro && corrida == null) corrida = x;
+          if (!escuro && corrida != null) { g.fillRect(Math.floor(vis.ox + corrida * t), Math.floor(vis.oy + y * t), Math.ceil((x - corrida) * t) + 1, Math.ceil(t) + 1); corrida = null; }
+        }
       }
-    }
+    });
   }
   // Sensor de Presença (habilidade genérica, maestria 2): quem olha "sente" os tokens escondidos num raio de
   // CON × 3 blocos (mínimo 1). Eles continuam invisíveis, mas a posição exata pulsa como um sonar vermelho.
@@ -2486,6 +2716,22 @@ window.DBOMapa = (function () {
         var cn = celulaEm(px, py), poeN = !selNevoa.has(cn.x + "," + cn.y);
         arrasto = { tipo: "nevoa", poe: poeN, ult: cn }; marcarNevoa(cn.x, cn.y, poeN); return;
       }
+      if (ui.ferramenta === "regua") {   // régua: não pega token; começa dentro dele, se clicar num
+        e.preventDefault(); fecharMenuToken();
+        var cr = celulaEm(px, py);
+        if (regua.ini) { fixarRegua(cr); return; }   // segurando a régua: este clique fixa
+        var fi = reguaFixaEm(px, py);
+        if (fi >= 0) {   // clicou numa régua fixa: solta ela (a ponta volta a seguir o mouse)
+          var rf = reguasFixas.splice(fi, 1)[0];
+          ui.sub.regua = rf.tipo; ui.angulo = rf.ang; atualizarBarra();
+          regua.ini = rf.ini; regua.fim = cr; reguaPega = true;
+          toast("Régua solta: clique para fixar de novo ou Esc para apagar.");
+          pedirDesenho(); return;
+        }
+        var tkR = tokenVisivelEm(px, py);
+        regua.ini = tkR ? celCentro(tkR, tkR.x, tkR.y) : cr; regua.fim = cr; reguaPress = { px: px, py: py };
+        dica.hidden = true; pedirDesenho(); return;
+      }
       var lt = lanternaEm(px, py);
       if (lt) { fecharMenuToken(); arrasto = { tipo: "mira", token: lt }; raiz.classList.add("is-movendo"); return; }
       var tk = tokenEm(px, py);
@@ -2496,8 +2742,8 @@ window.DBOMapa = (function () {
         raiz.classList.add("is-segurando"); if (sessao && podeEditar) document.documentElement.classList.add("mp-segurando");
         pedirDesenho(); return;
       }
-      // quem não edita (jogador na Sessão): arrastar com o botão esquerdo só move a vista
-      if (!podeEditar && ui.ferramenta !== "regua") { arrasto = { tipo: "mover", px: px, py: py, ox: vis.ox, oy: vis.oy }; raiz.classList.add("is-movendo"); return; }
+      // Mão (mestre) ou jogador: arrastar com o botão esquerdo só move a vista
+      if (ui.ferramenta === "mao" || (!podeEditar && ui.ferramenta !== "regua")) { arrasto = { tipo: "mover", px: px, py: py, ox: vis.ox, oy: vis.oy }; raiz.classList.add("is-movendo"); return; }
       var c = celulaEm(px, py);
       if ((ui.ferramenta === "caneta" && ui.sub.caneta === "parede") || (ui.ferramenta === "borracha" && ui.sub.borracha === "borracha" && (function () { var b = bordaPerto(px, py); return b && mapa.muros.has(b); })())) {
         var b0 = bordaPerto(px, py);
@@ -2521,7 +2767,6 @@ window.DBOMapa = (function () {
         previa = previaExplosao(c, c);
         pedirDesenho(); return;
       }
-      if (ui.ferramenta === "regua") { regua.ini = c; regua.fim = c; dica.hidden = true; pedirDesenho(); }
     });
     tela.addEventListener("pointermove", function (e) {
       var r = tela.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top;
@@ -2589,12 +2834,17 @@ window.DBOMapa = (function () {
         if (!regua.fim || c.x !== regua.fim.x || c.y !== regua.fim.y) { regua.fim = c; dica.hidden = true; pedirDesenho(); }
         clearTimeout(reguaT);
         // parado por 0,2 s: mostra a distância embaixo do mouse
-        reguaT = setTimeout(function () { mostrarDica(px, py, textoRegua()); }, 200);
+        reguaT = setTimeout(function () { if (regua.ini) mostrarDica(px, py, textoRegua()); }, 200);
       }
-      raiz.classList.toggle("is-sobre-token", !!tokenEm(px, py));
+      raiz.classList.toggle("is-sobre-token", ui.ferramenta !== "regua" && !!tokenEm(px, py));
     });
     var soltar = function (e) {
       if (e.pointerType === "touch") { toques.delete(e.pointerId); if (toques.size < 2) pinca = null; }
+      if (reguaPress && regua.ini && e.type === "pointerup") {   // arrastou a régua e soltou: fixa onde soltou
+        var rr = tela.getBoundingClientRect(), longe = Math.hypot(e.clientX - rr.left - reguaPress.px, e.clientY - rr.top - reguaPress.py) > Math.max(12, tam() * .8);
+        reguaPress = null;
+        if (longe) { var rcel = celulaEm(e.clientX - rr.left, e.clientY - rr.top); fixarRegua(rcel); }
+      }
       if (!arrasto) return;
       var a = arrasto; arrasto = null;
       raiz.classList.remove("is-movendo", "is-segurando", "is-sobre-lista");
@@ -2635,7 +2885,15 @@ window.DBOMapa = (function () {
       if (!podeEditar && (e.ctrlKey || e.metaKey)) return;
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) aplicarHistorico(refazer, desfazer); else aplicarHistorico(desfazer, refazer); }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") { e.preventDefault(); aplicarHistorico(refazer, desfazer); }
-      if (e.key === "Escape") { if (selNevoa) sairNevoa(); fecharEditorTexto(); if (mira) sairMira(); if (recorte) sairRecorte(); if (gotas) sairGotas(); fecharMenuToken(); regua.ini = null; regua.fim = null; dica.hidden = true; cancelarArrasto(); pedirDesenho(); }
+      if (e.key === "Escape") {
+        // Esc cancela o que estiver acontecendo; sem nada para cancelar, o mestre volta para a Mão
+        var algo = selNevoa || editorTexto || mira || recorte || gotas || menuTk || regua.ini || reguaPega || arrasto;
+        if (selNevoa) sairNevoa(); fecharEditorTexto(); if (mira) sairMira(); if (recorte) sairRecorte(); if (gotas) sairGotas(); fecharMenuToken();
+        if (reguaPega) { reguaPega = null; toast("Régua apagada."); }
+        regua.ini = null; regua.fim = null; dica.hidden = true; cancelarArrasto();
+        if (!algo && podeEditar && ui.ferramenta !== "mao") escolher("mao");
+        pedirDesenho();
+      }
       // setas movem o mapa (teclado)
       var passo = 3 * tam();
       if (document.activeElement === tela) {
@@ -2670,7 +2928,7 @@ window.DBOMapa = (function () {
     yes.addEventListener("click", function () {
       d.close();
       if (sessao) { if (opts.aoTirar) opts.aoTirar(); return; }
-      mapa.celulas = new Map(); sujar(); mapa.layers = null; mapa.recortes = null; mapa.sombras = false; mapa.caverna = false; mapa.muros = new Map(); mapa.nevoa = new Map(); mapa.textos = []; mapa.fundo = null; mapa.tokens = []; mapa.titulo = "Mapa sem título"; mapa.papel = null;
+      mapa.celulas = new Map(); sujar(); mapa.layers = null; mapa.recortes = null; mapa.sombras = false; mapa.caverna = false; mapa.semMemoria = false; mapa.muros = new Map(); reguasFixas = []; mapa.nevoa = new Map(); mapa.textos = []; mapa.fundo = null; mapa.tokens = []; mapa.titulo = "Mapa sem título"; mapa.papel = null;
       tituloEl.textContent = mapa.titulo;
       desfazer = []; refazer = []; previa = null; regua.ini = null; regua.fim = null; dica.hidden = true;
       imgFundoSrc = ""; imgFundo = null;
@@ -2850,7 +3108,8 @@ window.DBOMapa = (function () {
       globais = [];
       if (raiz && raiz.parentNode) raiz.parentNode.removeChild(raiz);
     },
-    _estado: function () { var v = visaoAtual(); return { mapa: mapa, vis: vis, ui: ui, zoomMin: zoomMin(), visao: v ? { blocos: v.vistos.size, tokens: Array.from(v.tokens) } : null }; }
+    _estado: function () { var v = visaoAtual(); return { mapa: mapa, vis: vis, ui: ui, zoomMin: zoomMin(), visao: v ? { blocos: v.vistos.size, tokens: Array.from(v.tokens) } : null, reguas: reguasFixas.map(function (r) { return [r.ini.x, r.ini.y, r.fim.x, r.fim.y, r.tipo]; }), reguaNaMao: !!regua.ini,
+      memoria: Object.keys(memoria.porToken).reduce(function (o, k) { o[k] = memoria.porToken[k].size; return o; }, {}) }; }
   };
   ultima = inst;
   return inst;
@@ -2867,7 +3126,7 @@ window.DBOMapa = (function () {
     d = d || {};
     var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     (d.celulas || []).forEach(function (c) { x0 = Math.min(x0, c[0]); y0 = Math.min(y0, c[1]); x1 = Math.max(x1, c[0] + 1); y1 = Math.max(y1, c[1] + 1); });
-    var base = { v: 1, titulo: d.titulo || "Mapa sem título", celulas: d.celulas || [], cor: d.cor || "rgb(255, 255, 255)", grade: d.grade || { on: true, cor: "rgba(120, 136, 160, 0.45)", esp: 1 }, papel: d.papel || null, fundo: d.fundo || null, layers: d.layers || null, sombras: !!d.sombras, caverna: !!d.caverna, muros: d.muros || [], nevoa: d.nevoa || [], textos: d.textos || [] };
+    var base = { v: 1, titulo: d.titulo || "Mapa sem título", celulas: d.celulas || [], cor: d.cor || "rgb(255, 255, 255)", grade: d.grade || { on: true, cor: "rgba(120, 136, 160, 0.45)", esp: 1 }, papel: d.papel || null, fundo: d.fundo || null, layers: d.layers || null, sombras: !!d.sombras, caverna: !!d.caverna, semMemoria: !!d.semMemoria, muros: d.muros || [], nevoa: d.nevoa || [], textos: d.textos || [] };
     var feito = function () {
       if (!isFinite(x0)) throw new Error("Esse mapa está vazio. Desenhe alguma coisa na aba Mapas antes de importar.");
       base.limite = { x0: x0, y0: y0, x1: x1, y1: y1 };

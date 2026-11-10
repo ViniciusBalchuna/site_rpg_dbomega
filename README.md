@@ -221,8 +221,14 @@ mestre põe e tira tokens e o jogador só move o token do próprio personagem.
 - **Paredes finas:** a borda entre um bloco e o vazio é parede; paredes internas ficam em `mapa.muros`
   ("x,y,layer,h|v"). Barram o andar e a visão (quem voa passa por cima).
 - **Névoa e textos:** `mapa.nevoa` ("x,y") e `mapa.textos` (etiquetas e textos corridos, até 50 caracteres).
-- **Mestre:** todas as ferramentas, olho "ver como" (jogador ou NPC), área limitada por jogador (clique no zoom),
-  olho fechado nos tokens que nenhum jogador vê.
+- **Mestre:** todas as ferramentas (a Mão só arrasta a vista e os tokens), olho "ver como" (jogador ou NPC), área
+  limitada por jogador (clique no zoom), olho fechado nos tokens que nenhum jogador vê.
+- **Régua:** começa dentro do token, não arrasta tokens; o 2º clique fixa a régua na tela (clicar nela solta de novo).
+- **Configurações (engrenagem):** pop-up com busca, para o mestre e para o jogador.
+- **Memória e telhados:** com sombras, o que o token já viu fica mais apagado (sem mostrar quem está lá); bloco de um
+  layer acima com chão embaixo vira telhado (escuro para quem está fora, some para quem entra embaixo).
+- **Escadas:** sem paredes em volta (as paredes finas encostadas nelas não valem); com chão por cima, aparecem de leve
+  no andar de cima.
 - **Arquivo `.dbomapa`:** JSON legível, uma linha de texto por linha do mapa e por layer (versão 2). O cabeçalho do
   `mapa.js` documenta o formato.
 - **Gravação na sessão:** o mestre grava o mapa inteiro (versão nova a cada mudança); tokens são linhas
