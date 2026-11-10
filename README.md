@@ -13,7 +13,7 @@ compartilhados.
 ![Prato de dados 3D](docs/capturas/prato-3d.gif)
 -->
 
-<!-- 🔗 Site no ar: https://rpg.dbomega.workers.dev/ -->
+🔗 **Site no ar:** <https://rpg.dbomega.workers.dev/>
 
 ## Destaques
 

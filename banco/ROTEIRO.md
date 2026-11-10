@@ -12,7 +12,7 @@ O site hoje guarda tudo no `localStorage` (cada navegador tem o seu mundo). O `s
 ## 1. Login (Auth)
 1. **Authentication → Providers**: deixe e-mail/senha ligado. Para o login com Google, ligue o provider Google (cria o Client ID no Google Cloud) — é o que traz a foto do perfil (`avatar_url`) que ainda falta.
 2. **Authentication → Providers → Email**: deixe **Confirm email** LIGADO. Assim o cadastro manda o e-mail de confirmação e quem não confirmou nem consegue entrar. O `schema.sql` ainda trava no banco: personagem só é criado por quem tem e-mail confirmado. Em **Authentication → Email Templates** você pode traduzir o texto do e-mail.
-3. **Authentication → URL Configuration**: Site URL = o endereço do site (ex.: `https://seu-site.workers.dev`) (e `http://localhost:xxxx` para testar).
+3. **Authentication → URL Configuration**: Site URL = `https://rpg.dbomega.workers.dev`. Em **Redirect URLs**, acrescente `https://rpg.dbomega.workers.dev/**` (e `http://localhost:xxxx/**` para testar).
 4. No site, preencha `url` e `key` em `js/supabase-config.js` (só a chave pública). Com isso o `js/auth.js` já troca sozinho do modo local para o Supabase: cadastro com e-mail de confirmação, login só para quem confirmou, botão de reenviar e retorno do link. O PBKDF2 local deixa de existir: o hash (bcrypt) fica no Supabase.
 5. O `_headers` já libera `*.supabase.co` no CSP (conexão e imagens). Se usar domínio próprio no Supabase, ajuste.
 
