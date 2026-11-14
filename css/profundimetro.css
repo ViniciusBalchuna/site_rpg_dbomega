@@ -1,0 +1,208 @@
+/* =========================================================
+   Dragon Ball Omega — landing "Profundímetro"
+   A página é um mergulho: cada área do site fica numa profundidade
+   (Superfície 0 m · Personagens 10 m · Enciclopédia 30 m · Campanha 60 m · Comece 100 m).
+   Um medidor fixo à esquerda (só em telas largas) mostra onde você está; cada seção traz uma
+   miniatura da tela real do site, para o visitante entender o que vai fazer antes de clicar.
+   Sem bichos animados: o mar é só a cor da água, que escurece conforme a página desce.
+
+   Uso: <html class="ocean profundimetro"> + este arquivo DEPOIS de style.css e mare.css.
+   O cabeçalho e o rodapé são os de sempre (style.css/mare.css); aqui só mudam as cores (seção 1).
+   Script: js/profundimetro.js (medidor e foto do Ashura).
+
+   Sumário: 1 Cores e medidas · 2 Fundo e base · 3 Botões · 4 Medidor lateral · 5 Seções e textos
+            6 Superfície (início) · 7 Janelas de exemplo (ficha, enciclopédia, sessão)
+            8 Chamada final · 9 Rodapé · 10 Movimento reduzido
+   ========================================================= */
+
+/* ===== 1. Cores e medidas ===== */
+/* Variáveis do site (--bg, --jade, --gold, --line, --header...) são redefinidas aqui, para o cabeçalho
+   herdar a paleta do mar. As variáveis --cor-* e --largura-* / --altura-* são só desta página. */
+:root.ocean.profundimetro {
+  --bg: #064A5E; --surface: #0A5A70;
+  --text: #F0FFFB; --muted: rgba(240,255,251,.82);
+  --jade: #FF8A3D; --on-jade: #2B1100; --gold: #FFD98A;
+  --line: rgba(190,255,245,.3); --glow: rgba(255,138,61,.35); --header: rgba(3,34,46,.9);
+  --danger: #FF9087; --red: #E0455A;
+
+  /* a água: da superfície (topo da página) ao fundo (rodapé) */
+  --cor-agua-superficie: #0E8DA0; --cor-agua-1: #0A6A7F; --cor-agua-2: #074458; --cor-agua-3: #042A3B; --cor-agua-fundo: #020E17;
+  --cor-agua: #6FF0DC;               /* detalhes em azul-turquesa: etiquetas, marcações, aba ativa */
+  --cor-sobre-agua: #032A3A;         /* texto em cima da cor acima */
+  --cor-painel: rgba(2,26,38,.62);   /* fundo das janelas de exemplo */
+  --cor-sutil: rgba(255,255,255,.07);        /* blocos leves dentro das janelas */
+  --cor-sutil-forte: rgba(255,255,255,.14);  /* trilhos das barras, bolinhas da janela */
+  --cor-grade-mapa: rgba(255,255,255,.1);
+  --cor-fundo-mapa: rgba(0,0,0,.18);
+  --cor-parede: rgba(255,255,255,.3);
+  --cor-ponto-medidor: #06303F;
+  --cor-onda: rgba(255,255,255,.28);
+  --sombra-janela: 0 20px 44px rgba(0,16,24,.4);
+
+  --largura-medidor: 132px;   /* espaço que o conteúdo reserva para o medidor, em telas largas */
+  --altura-cabecalho: 65px;   /* 119px no celular, onde o cabeçalho tem duas linhas (ver seção 6) */
+}
+:root.ocean.profundimetro[data-theme="light"] {
+  --bg: #86D8D4; --surface: #F2FFFC;
+  --text: #052E3A; --muted: rgba(5,46,58,.84);
+  --jade: #C8470F; --on-jade: #FFF8F0; --gold: #8A4300;
+  --line: rgba(5,80,95,.34); --glow: rgba(200,71,15,.28); --header: rgba(190,240,234,.92);
+  --danger: #B3261E; --red: #C42B3A;
+
+  --cor-agua-superficie: #C6F2EC; --cor-agua-1: #A9E6E0; --cor-agua-2: #8CD9D8; --cor-agua-3: #72CBD0; --cor-agua-fundo: #58BCC6;
+  --cor-agua: #0A6A64;
+  --cor-sobre-agua: #FFFFFF;
+  --cor-painel: rgba(255,255,255,.72);
+  --cor-sutil: rgba(5,46,58,.07);
+  --cor-sutil-forte: rgba(5,46,58,.15);
+  --cor-grade-mapa: rgba(5,46,58,.14);
+  --cor-fundo-mapa: rgba(255,255,255,.4);
+  --cor-parede: rgba(5,46,58,.4);
+  --cor-ponto-medidor: #E4F8F5;
+  --cor-onda: rgba(255,255,255,.7);
+  --sombra-janela: 0 16px 34px rgba(5,70,85,.2);
+}
+
+/* ===== 2. Fundo e base ===== */
+:root.profundimetro body {
+  background: linear-gradient(180deg, var(--cor-agua-superficie) 0, var(--cor-agua-1) 14%, var(--cor-agua-2) 38%, var(--cor-agua-3) 66%, var(--cor-agua-fundo) 100%) var(--cor-agua-fundo);
+  color: var(--text);
+}
+.profundimetro body > main { flex: 1 0 auto; }
+:where(.profundimetro) p { margin: 0; } /* :where() não conta na especificidade, então as margens definidas nas classes abaixo ainda valem */
+/* style.css dá borda e espaço extra aos títulos; aqui eles ficam soltos */
+.profundimetro h1, .profundimetro h2 { margin: 0; padding: 0; border: 0; line-height: 1.2; text-wrap: balance; }
+.profundimetro h1 { max-width: 19ch; font-size: clamp(2rem, 1.2rem + 2.8vw, 3.1rem); }
+.profundimetro h2 { font-size: clamp(1.6rem, 1.1rem + 1.5vw, 2.2rem); }
+
+/* ===== 3. Botões ===== */
+.profundimetro .btn { min-height: 46px; padding: 0 22px; border-radius: 12px; transition: transform .15s, filter .15s, background .2s, border-color .2s; }
+.profundimetro .btn:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 10px 24px var(--glow); }
+.profundimetro .btn:active { transform: none; }
+.profundimetro .btn--ghost { color: var(--text); border-color: var(--line); }
+.profundimetro .btn--ghost:hover { background: var(--cor-sutil); border-color: var(--line); color: var(--text); filter: none; box-shadow: none; }
+.acoes { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+@media (max-width: 520px) { .acoes .btn { width: 100%; } }
+
+/* ===== 4. Medidor lateral (só em telas largas) ===== */
+.medidor { position: fixed; left: 24px; top: 50%; transform: translateY(-50%); z-index: 20; display: none; }
+.medidor ol { position: relative; display: grid; gap: 30px; margin: 0; padding: 0 0 0 18px; list-style: none; }
+.medidor ol::before { content: ""; position: absolute; left: 4px; top: 8px; bottom: 8px; border-left: 2px solid var(--line); }
+.medidor__link { position: relative; display: block; color: var(--muted); font-size: .85rem; line-height: 1.25; text-decoration: none; transition: color .2s; }
+.medidor__link::before { content: ""; position: absolute; left: -18px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--cor-ponto-medidor); border: 2px solid var(--line); transition: background .2s, border-color .2s, box-shadow .2s; }
+.medidor__link b { display: block; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.medidor__link:hover, .medidor__link.is-ativo { color: var(--text); }
+.medidor__link.is-ativo::before { background: var(--jade); border-color: var(--jade); box-shadow: 0 0 0 4px var(--glow); }
+@media (min-width: 1180px) {
+  .medidor { display: block; }
+  .profundimetro main { padding-left: var(--largura-medidor); }
+}
+
+/* ===== 5. Seções e textos ===== */
+.secao { padding-block: clamp(64px, 9vw, 112px); }
+.etiqueta-profundidade { display: inline-block; margin-bottom: 14px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--cor-agua); font-size: .85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.dividido { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: center; }
+.dividido--invertido { grid-template-columns: 1.1fr .9fr; }
+.dividido--invertido .coluna-texto { order: 2; }
+.coluna-texto > p { max-width: 44ch; margin-top: 14px; color: var(--muted); }
+.lista-marcada { display: grid; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; color: var(--muted); }
+.lista-marcada li { position: relative; padding-left: 28px; }
+.lista-marcada li::before { content: ""; position: absolute; left: 0; top: .42em; width: 18px; height: 18px; border-radius: 50%; background: var(--cor-agua); }
+.lista-marcada li::after { content: ""; position: absolute; left: 6px; top: calc(.42em + 3px); width: 5px; height: 9px; border: solid var(--cor-sobre-agua); border-width: 0 2.4px 2.4px 0; transform: rotate(45deg); }
+.link-secao { display: inline-block; margin-top: 22px; color: var(--jade); font-weight: 700; text-decoration: none; }
+.link-secao:hover { text-decoration: underline; }
+@media (max-width: 900px) {
+  .dividido, .dividido--invertido { grid-template-columns: 1fr; gap: 32px; }
+  .dividido--invertido .coluna-texto { order: 0; }
+}
+
+/* ===== 6. Superfície (início): ocupa a primeira tela, com as ondas embaixo ===== */
+.superficie { display: flex; flex-direction: column; min-height: calc(100svh - var(--altura-cabecalho)); padding: clamp(48px, 8vw, 96px) 0 0; }
+.superficie .wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-bottom: 40px; }
+.superficie .etiqueta-profundidade { align-self: flex-start; }
+.apresentacao { max-width: 50ch; margin-top: 18px; color: var(--muted); font-size: 1.1rem; }
+.fatos { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 36px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: .95rem; }
+.fatos li + li::before { content: "· "; color: var(--cor-agua); }
+.ondas { display: block; width: 100%; height: 60px; color: var(--cor-onda); }
+@media (min-width: 1180px) { .ondas { width: calc(100% + var(--largura-medidor)); margin-left: calc(var(--largura-medidor) * -1); } } /* as ondas cobrem também o espaço do medidor */
+@media (max-width: 640px) { :root.profundimetro { --altura-cabecalho: 119px; } }
+
+/* ===== 7. Janelas de exemplo ===== */
+.janela { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--cor-painel); box-shadow: var(--sombra-janela); }
+.janela__barra { display: flex; gap: 6px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.janela__barra i { width: 10px; height: 10px; border-radius: 50%; background: var(--cor-sutil-forte); }
+.janela__corpo { padding: 20px; }
+
+/* ficha de exemplo */
+.ficha-exemplo__topo { display: flex; align-items: center; gap: 14px; }
+.avatar { flex: none; width: 52px; height: 52px; overflow: hidden; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, #FF8A3D, #FFC93C); color: #2B1100; font: 800 1.3rem var(--serif); }
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ficha-exemplo__nome { display: block; font-size: 1.15rem; }
+.ficha-exemplo__detalhe { color: var(--muted); font-size: .88rem; }
+.ficha-exemplo__poder { margin-left: auto; text-align: right; color: var(--muted); font-size: .8rem; }
+.ficha-exemplo__poder strong { display: block; color: var(--gold); font-size: 1.15rem; }
+.barra-status { margin-top: 14px; }
+.barra-status__linha { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: .86rem; }
+.barra-status__linha b { font-variant-numeric: tabular-nums; }
+.barra-status__trilho { height: 9px; overflow: hidden; border-radius: 9px; background: var(--cor-sutil-forte); }
+.barra-status__preenchimento { display: block; height: 100%; }
+.barra-status--vida .barra-status__preenchimento { background: linear-gradient(90deg, #E0455A, #FF8A3D); }
+.barra-status--energia .barra-status__preenchimento { background: linear-gradient(90deg, #2A62D4, #6FF0DC); }
+.atributos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 18px; }
+.atributos div { padding: 8px 0; border-radius: 10px; background: var(--cor-sutil); text-align: center; }
+.atributos small { display: block; color: var(--muted); font-size: .7rem; letter-spacing: .06em; }
+.atributos b { font-size: 1.05rem; }
+
+/* enciclopédia de exemplo */
+.abas { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.abas span { padding: 6px 12px; border-radius: 999px; background: var(--cor-sutil); color: var(--muted); font-size: .84rem; font-weight: 700; }
+.abas .abas__aba--ativa { background: var(--cor-agua); color: var(--cor-sobre-agua); }
+.lista-verbetes { margin: 0; padding: 0; list-style: none; }
+.lista-verbetes li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.lista-verbetes li:first-child { border-top: 0; }
+.lista-verbetes__icone { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: var(--cor-sutil); color: var(--cor-agua); font-size: .85rem; font-weight: 800; }
+.lista-verbetes b { display: block; }
+.lista-verbetes small { color: var(--muted); }
+.lista-verbetes__acao { margin-left: auto; color: var(--gold); font-size: .8rem; }
+
+/* sessão de exemplo: ordem de combate · mapa · registro */
+.sessao-exemplo { display: grid; grid-template-columns: 120px 1fr 150px; min-height: 270px; }
+.sessao-exemplo__coluna { padding: 12px; border-left: 1px solid var(--line); }
+.sessao-exemplo__coluna:first-child { border-left: 0; }
+.sessao-exemplo__titulo { margin-bottom: 8px; color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.ordem-combate { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: .84rem; }
+.ordem-combate li { display: flex; align-items: center; gap: 8px; }
+.ordem-combate i { width: 10px; height: 10px; border-radius: 50%; background: var(--cor); }
+.mapa-exemplo { position: relative; height: calc(100% - 24px); min-height: 230px; border-radius: 10px; background:
+  linear-gradient(var(--cor-grade-mapa) 1px, transparent 1px) 0 0 / 34px 34px,
+  linear-gradient(90deg, var(--cor-grade-mapa) 1px, transparent 1px) 0 0 / 34px 34px,
+  var(--cor-fundo-mapa); }
+.parede { position: absolute; border-radius: 2px; background: var(--cor-parede); }
+.peca { position: absolute; left: var(--x); top: var(--y); width: 26px; height: 26px; display: grid; place-items: center; border: 2px solid #fff; border-radius: 50%; background: var(--cor); color: #fff; font-size: .7rem; font-weight: 800; }
+.registro { display: grid; gap: 8px; font-size: .78rem; color: var(--muted); }
+.registro__rolagem { padding: 6px 8px; border-radius: 8px; background: var(--cor-sutil); }
+.registro__rolagem b { color: var(--text); }
+.registro__rolagem strong { color: var(--gold); font-size: .95rem; }
+@media (max-width: 560px) {
+  .sessao-exemplo { grid-template-columns: 1fr; }
+  .sessao-exemplo__coluna { border-left: 0; border-top: 1px solid var(--line); }
+  .sessao-exemplo__coluna:first-child { border-top: 0; }
+}
+
+/* ===== 8. Chamada final (100 m) ===== */
+.chamada-final { padding-bottom: 0; text-align: center; }
+.chamada-final .etiqueta-profundidade { margin-bottom: 16px; }
+.chamada-final p { max-width: 44ch; margin: 14px auto 28px; color: var(--muted); }
+.pontos-luminosos { display: flex; justify-content: center; gap: 10px; margin: 70px 0 70px; }
+.pontos-luminosos i { width: 7px; height: 7px; border-radius: 50%; background: var(--cor-agua); box-shadow: 0 0 12px var(--cor-agua); opacity: .7; }
+.pontos-luminosos i:nth-child(2n) { opacity: .35; }
+
+/* ===== 9. Rodapé ===== */
+/* O conteúdo da página é empurrado pelo medidor; o rodapé recebe o mesmo espaço, para o texto ficar centralizado com o resto */
+.profundimetro .site-footer { padding: 22px 0; border-top: 1px solid var(--line); font-style: normal; }
+@media (min-width: 1180px) { .profundimetro .site-footer { padding-left: var(--largura-medidor); } }
+
+/* ===== 10. Movimento reduzido ===== */
+@media (prefers-reduced-motion: reduce) {
+  .profundimetro .btn, .medidor__link, .medidor__link::before { transition: none; }
+}

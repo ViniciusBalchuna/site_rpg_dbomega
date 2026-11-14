@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dragon ocean">
+<html lang="pt-BR" class="ocean profundimetro">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/dragao.css">
   <link rel="stylesheet" href="css/mare.css">
+  <link rel="stylesheet" href="css/profundimetro.css">
   <script src="js/theme.js"></script>
   <script src="js/transition.js"></script>
 </head>
@@ -33,83 +33,172 @@
     </div>
   </header>
 
-  <main id="inicio" class="m4">
-    <section class="m4__hero">
-      <div class="m4__bubbles" aria-hidden="true"><i style="--x:8%;--s:14px;--d:0s;--w:15s"></i><i style="--x:22%;--s:8px;--d:4s;--w:12s"></i><i style="--x:36%;--s:18px;--d:8s;--w:17s"></i><i style="--x:64%;--s:10px;--d:2s;--w:13s"></i><i style="--x:78%;--s:16px;--d:6s;--w:16s"></i><i style="--x:92%;--s:9px;--d:10s;--w:14s"></i></div>
-      <div class="wrap m4__heroin">
-        <p class="m4__eyebrow"><span></span>RPG de mesa · ficha digital</p>
-        <h1>O tão aguardado RPG, <span class="m4__grad">finalmente pronto!</span></h1>
-        <p class="lead">O Dragon Ball Omega guarda a ficha do seu personagem e faz as contas chatas por você. Você continua vendo aqueles números absurdos de poder e foca no que importa: a luta!</p>
-        <div class="actions">
+  <!-- Medidor de profundidade: cada marcador leva à seção; o marcador ativo muda com a rolagem (js/profundimetro.js). Só aparece em telas largas. -->
+  <nav class="medidor" aria-label="Profundidade da página">
+    <ol>
+      <li><a class="medidor__link is-ativo" href="#superficie"><b>0 m</b>Superfície</a></li>
+      <li><a class="medidor__link" href="#personagens"><b>10 m</b>Personagens</a></li>
+      <li><a class="medidor__link" href="#enciclopedia"><b>30 m</b>Enciclopédia</a></li>
+      <li><a class="medidor__link" href="#campanha"><b>60 m</b>Campanha</a></li>
+      <li><a class="medidor__link" href="#comece"><b>100 m</b>Comece</a></li>
+    </ol>
+  </nav>
+
+  <main id="inicio">
+
+    <!-- 0 m · Superfície: o que é o site, numa frase -->
+    <section id="superficie" class="superficie" aria-labelledby="titulo-superficie">
+      <div class="wrap">
+        <span class="etiqueta-profundidade">0 m · Superfície</span>
+        <h1 id="titulo-superficie">O RPG de Dragon Ball Omega, agora com ficha, enciclopédia e mesa online.</h1>
+        <p class="apresentacao">O site guarda seus personagens, faz as contas dos números gigantes e conduz a sessão ao vivo. Você só precisa jogar.</p>
+        <div class="acoes">
           <a class="btn" href="personagens.html">Criar minha ficha</a>
-          <a class="btn btn--ghost" href="#como-criar">Como funciona?</a>
+          <a class="btn btn--ghost" href="#personagens">Ver o que tem no site</a>
         </div>
-        <ul class="m4__chips"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Cálculo automático</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Números fáceis de ler</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Tema claro e escuro</li></ul>
-        <div class="sheet-wrap" id="sheet-wrap">
-          <aside class="sheet" aria-label="Exemplo ilustrativo de ficha">
-            <div class="sheet__top">
-              <div class="sheet__photo" id="ashura-photo"><span aria-hidden="true">A</span></div>
-              <p class="sheet__name">Ashura</p>
+        <ul class="fatos">
+          <li>As contas da ficha são feitas sozinhas</li>
+          <li>Tema claro e escuro</li>
+          <li>Funciona no celular</li>
+        </ul>
+      </div>
+      <svg class="ondas" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"><path d="M0 24c120 22 240 22 360 0s240-22 360 0 240 22 360 0 240-22 360 0"/><path opacity=".5" d="M0 44c120 22 240 22 360 0s240-22 360 0 240 22 360 0 240-22 360 0"/></g></svg>
+    </section>
+
+    <!-- 10 m · Personagens: miniatura da ficha (os termos do jogo aparecem aqui porque são a própria ficha) -->
+    <section id="personagens" class="secao" aria-labelledby="titulo-personagens">
+      <div class="wrap dividido">
+        <div class="coluna-texto">
+          <span class="etiqueta-profundidade">10 m · Personagens</span>
+          <h2 id="titulo-personagens">Monte a ficha uma vez.</h2>
+          <p>Preencha os dados do personagem. O site faz as contas e guarda tudo para a próxima sessão.</p>
+          <ul class="lista-marcada">
+            <li>Criação guiada em 5 passos</li>
+            <li>Contas feitas sozinhas, sem calculadora</li>
+            <li>Números grandes separados e fáceis de ler</li>
+          </ul>
+          <a class="link-secao" href="personagens.html">Abrir minhas fichas →</a>
+        </div>
+        <div class="janela" role="group" aria-label="Exemplo de ficha de personagem">
+          <div class="janela__barra" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="janela__corpo ficha-exemplo">
+            <div class="ficha-exemplo__topo">
+              <!-- A letra "A" é trocada pela foto em imagem/personagem/ashura.* quando ela existe (js/profundimetro.js) -->
+              <div class="avatar" id="foto-ashura"><span aria-hidden="true">A</span></div>
+              <div>
+                <b class="ficha-exemplo__nome">Ashura</b>
+                <span class="ficha-exemplo__detalhe">Deus Sayajin · Guerreiro</span>
+              </div>
+              <p class="ficha-exemplo__poder">Power-Level<strong>62.000.000</strong></p>
             </div>
-            <dl class="sheet__facts">
-              <div><dt>Raça</dt><dd>Deus Sayajin</dd></div>
-              <div><dt>Classe</dt><dd>Guerreiro</dd></div>
-              <div><dt>Alinhamento</dt><dd>Bom e Neutro</dd></div>
-            </dl>
-            <p class="sheet__label">Descrição</p>
-            <p class="sheet__desc">Renomado Sayajin, Populista e cultuado.</p>
-            <div class="stat stat--hp">
-              <div class="stat__row"><span>HP</span><b>48.250.000 / 62.000.000</b></div>
-              <div class="track"><div class="fill" style="width:78%"></div></div>
+            <div class="barra-status barra-status--vida">
+              <div class="barra-status__linha"><span>HP</span><b>48.250.000 / 62.000.000</b></div>
+              <div class="barra-status__trilho"><i class="barra-status__preenchimento" style="width:78%"></i></div>
             </div>
-            <div class="stat stat--kp">
-              <div class="stat__row"><span>KP</span><b>31.400.000 / 40.000.000</b></div>
-              <div class="track"><div class="fill" style="width:78.5%"></div></div>
+            <div class="barra-status barra-status--energia">
+              <div class="barra-status__linha"><span>KP</span><b>31.400.000 / 40.000.000</b></div>
+              <div class="barra-status__trilho"><i class="barra-status__preenchimento" style="width:78%"></i></div>
             </div>
-            <p class="sheet__note">Valores só de exemplo.</p>
-          </aside>
+            <div class="atributos">
+              <div><small>STR</small><b>14</b></div>
+              <div><small>DEX</small><b>11</b></div>
+              <div><small>CON</small><b>13</b></div>
+              <div><small>MND</small><b>9</b></div>
+              <div><small>SPI</small><b>12</b></div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="m4__waves" aria-hidden="true"><svg class="m4__wave m4__w m4__w--back" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 49.5 C 240 4.5, 480 85.5, 720 45.0 S 1200 4.5, 1440 40.5 V 90 H0Z"/></svg><svg class="m4__wave m4__w m4__w--front" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 49.5 C 240 4.5, 480 85.5, 720 45.0 S 1200 4.5, 1440 40.5 V 90 H0Z"/></svg></div>
     </section>
 
-    <section id="sobre" class="m4__band m4__band--a">
-      <div class="wrap">
-        <p class="m4__kicker">Sobre</p>
-        <h2 class="rv">Nossa história até aqui.</h2>
-        <div class="m4__story rv"><p>Dragon Ball Omega é um RPG de mesa em que os poderes chegam a números que ninguém quer somar no papel. Por isso este site existe: pra você jogar numa boa, sem se perder em cálculos absurdos, e ainda curtir esses números gigantes que fazem a graça do sistema.</p><p>Monta sua ficha uma vez e o site cuida do resto, da primeira luta até a última saga.</p></div>
-        <ul class="m4__cards"><li class="rv" style="--i:0"><span class="m4__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></svg></span><h3>As contas ficam com o site</h3><p>Você preenche os dados do personagem e o Omega calcula o resto.</p></li><li class="rv" style="--i:1"><span class="m4__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/></svg></span><h3>Números fáceis de ler</h3><p>Milhões e bilhões aparecem separados direitinho, em qualquer tela.</p></li><li class="rv" style="--i:2"><span class="m4__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 8.5h.01M15.5 8.5h.01M12 12h.01M8.5 15.5h.01M15.5 15.5h.01"/></svg></span><h3>Feito pra mesa</h3><p>Fichas, enciclopédia e campanha num lugar só, pra galera toda.</p></li></ul>
-      </div>
-    </section>
-
-    <section id="artes" class="m4__band m4__band--a m4__arts" aria-labelledby="h-artes">
-      <div class="wrap">
-        <p class="m4__kicker">Galeria</p>
-        <h2 id="h-artes" class="rv">Artes</h2>
-        <div id="arts" class="m4__car rv" role="group" aria-roledescription="carrossel" aria-label="Artes do Dragon Ball Omega" tabindex="0">
-          <p class="m4__empty">Em breve, artes por aqui.</p>
+    <!-- 30 m · Enciclopédia: miniatura da lista de verbetes -->
+    <section id="enciclopedia" class="secao" aria-labelledby="titulo-enciclopedia">
+      <div class="wrap dividido dividido--invertido">
+        <div class="coluna-texto">
+          <span class="etiqueta-profundidade">30 m · Enciclopédia</span>
+          <h2 id="titulo-enciclopedia">O universo para consultar.</h2>
+          <p>Criaturas, planetas, missões e mistérios organizados num só lugar. O mestre atualiza, a mesa lê.</p>
+          <ul class="lista-marcada">
+            <li>Bestiário e planetas</li>
+            <li>Missões e mistérios da campanha</li>
+            <li>Novidades do sistema em Atualizações</li>
+          </ul>
+          <a class="link-secao" href="enciclopedia.html">Abrir enciclopédia →</a>
         </div>
-        <p class="m4__tag rv">Cada momento, cada combate, cada história, agora oficialmente digital</p>
+        <div class="janela" role="group" aria-label="Exemplo da enciclopédia">
+          <div class="janela__barra" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="janela__corpo">
+            <div class="abas" aria-hidden="true"><span class="abas__aba--ativa">Bestiário</span><span>Planetas</span><span>Missões</span><span>Mistérios</span></div>
+            <ul class="lista-verbetes">
+              <li><span class="lista-verbetes__icone" aria-hidden="true">B</span><div><b>Criatura de exemplo</b><small>Bestiário · nível 3</small></div><em class="lista-verbetes__acao">Ver</em></li>
+              <li><span class="lista-verbetes__icone" aria-hidden="true">P</span><div><b>Planeta de exemplo</b><small>Planetas · Setor sul</small></div><em class="lista-verbetes__acao">Ver</em></li>
+              <li><span class="lista-verbetes__icone" aria-hidden="true">M</span><div><b>Missão de exemplo</b><small>Missões · em aberto</small></div><em class="lista-verbetes__acao">Ver</em></li>
+              <li><span class="lista-verbetes__icone" aria-hidden="true">?</span><div><b>Mistério de exemplo</b><small>Mistérios · pista 2 de 5</small></div><em class="lista-verbetes__acao">Ver</em></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="como-criar" class="m4__band m4__band--b">
-      <svg class="m4__wave m4__w m4__w--b" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 38.5 C 240 3.5, 480 66.5, 720 35.0 S 1200 3.5, 1440 31.5 V 70 H0Z"/></svg>
+    <!-- 60 m · Campanha: miniatura da sessão ao vivo (ordem de combate, mapa e registro) -->
+    <section id="campanha" class="secao" aria-labelledby="titulo-campanha">
+      <div class="wrap dividido">
+        <div class="coluna-texto">
+          <span class="etiqueta-profundidade">60 m · Campanha</span>
+          <h2 id="titulo-campanha">A sessão acontece aqui.</h2>
+          <p>Mestre e jogadores veem o mesmo mapa, a mesma ordem de combate e o mesmo registro de rolagens, em tempo real.</p>
+          <ul class="lista-marcada">
+            <li>Mapa com personagens, paredes e campo de visão</li>
+            <li>Dados em 3D e registro das rolagens</li>
+            <li>Ordem de combate, personagens do mestre e anotações</li>
+          </ul>
+          <a class="link-secao" href="campanha.html">Entrar na campanha →</a>
+        </div>
+        <div class="janela" role="group" aria-label="Exemplo da sessão ao vivo">
+          <div class="janela__barra" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="sessao-exemplo">
+            <div class="sessao-exemplo__coluna">
+              <p class="sessao-exemplo__titulo">Ordem</p>
+              <ul class="ordem-combate">
+                <li style="--cor:#FF8A3D"><i></i>Ashura</li>
+                <li style="--cor:#4C8DFF"><i></i>Jogador 2</li>
+                <li style="--cor:#E0455A"><i></i>Inimigo 1</li>
+                <li style="--cor:#4FD6C8"><i></i>Jogador 3</li>
+              </ul>
+            </div>
+            <div class="sessao-exemplo__coluna">
+              <p class="sessao-exemplo__titulo">Mapa</p>
+              <div class="mapa-exemplo">
+                <span class="parede" style="left:34%;top:0;width:4px;height:55%"></span>
+                <span class="parede" style="left:34%;top:55%;width:42%;height:4px"></span>
+                <span class="peca" style="--cor:#FF8A3D;--x:14%;--y:28%">A</span>
+                <span class="peca" style="--cor:#4C8DFF;--x:20%;--y:64%">2</span>
+                <span class="peca" style="--cor:#E0455A;--x:66%;--y:30%">1</span>
+                <span class="peca" style="--cor:#4FD6C8;--x:80%;--y:70%">3</span>
+              </div>
+            </div>
+            <div class="sessao-exemplo__coluna">
+              <p class="sessao-exemplo__titulo">Registro</p>
+              <div class="registro">
+                <div class="registro__rolagem"><b>Ashura</b> rolou ataque<br><strong>17</strong></div>
+                <div class="registro__rolagem"><b>Inimigo 1</b> defendeu<br><strong>12</strong></div>
+                <div class="registro__rolagem">Dano aplicado</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 100 m · Comece: chamada final -->
+    <section id="comece" class="secao chamada-final" aria-labelledby="titulo-comece">
       <div class="wrap">
-        <p class="m4__kicker">Passo a passo</p>
-        <h2 class="rv">Como criar sua ficha</h2>
-        <ol class="m4__steps"><li class="rv" style="--i:0"><span class="m4__dot">1</span><strong>Entre em Personagens</strong><span>É só clicar no menu lá no topo.</span></li><li class="rv" style="--i:1"><span class="m4__dot">2</span><strong>Comece uma ficha nova</strong><span>Escolha nome, raça, classe racial e alinhamento.</span></li><li class="rv" style="--i:2"><span class="m4__dot">3</span><strong>Distribua seus atributos</strong><span>Defina STR, DEX, CON, MND e SPI do seu personagem.</span></li><li class="rv" style="--i:3"><span class="m4__dot">4</span><strong>Confere tudo e salva</strong><span>O site calcula HP, KP e Power-Level pra você. Dá uma olhada e salva a ficha pra próxima sessão.</span></li></ol>
+        <span class="etiqueta-profundidade">100 m · Fundo do mar</span>
+        <h2 id="titulo-comece">Chegue à mesa com a ficha pronta.</h2>
+        <p>Crie sua ficha em poucos minutos, salve e volte quando a próxima sessão chegar.</p>
+        <a class="btn" href="personagens.html">Criar minha ficha</a>
       </div>
-    </section>
-
-    <section class="m4__cta">
-      <svg class="m4__wave m4__w m4__w--c" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 38.5 C 240 3.5, 480 66.5, 720 35.0 S 1200 3.5, 1440 31.5 V 70 H0Z"/></svg>
-      <div class="wrap m4__ctain rv">
-        <div class="m4__ctadrag" id="cta-drag" aria-hidden="true"></div>
-        <h2>Bora criar sua ficha?</h2>
-        <p>Leva poucos minutos. Depois é só jogar: as contas ficam com a gente.</p>
-        <a class="btn m4__ctabtn" href="personagens.html">Bora pra Personagens</a>
-      </div>
+      <div class="pontos-luminosos" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </section>
   </main>
 
@@ -124,8 +213,6 @@
   <script src="js/characters.js"></script>
   <script src="js/enciclopedia-data.js"></script>
   <script src="js/prefetch.js"></script>
-  <script src="js/dragao.js"></script>
-  <script src="js/landing.js"></script>
-  <script src="js/mare.js"></script>
+  <script src="js/profundimetro.js"></script>
 </body>
 </html>

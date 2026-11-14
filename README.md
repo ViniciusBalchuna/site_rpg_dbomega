@@ -85,8 +85,8 @@ css/                  um arquivo por área (style.css é a base; mapa.css, sessa
 js/                   um módulo por área (ver seção 4)
 banco/                schema.sql (banco completo) + ROTEIRO.md (como ligar o Supabase)
 banco/migracoes/      migracao-NN.sql: atualizações de um banco que já existe, em ordem
-imagem/               logo, favicons (um por tema da sessão), artes
-ferramentas/          scripts de apoio (gerar artes, servidor do modo debug)
+imagem/               logo, favicons (um por tema da sessão) e a foto do personagem de exemplo da landing
+ferramentas/          scripts de apoio (servidor do modo debug)
 ```
 
 ---

@@ -1,7 +1,0 @@
-Artes da landing page (caixa "Artes").
-
-1. Coloque aqui as imagens (.jpg, .png, .webp...). Só imagens da caixa de Artes devem ficar nesta pasta.
-2. Escreva o nome de cada arquivo, na ordem em que devem aparecer, no arquivo artes.json. Exemplo:
-   ["arte1.jpg", "arte2.png", "batalha.webp"]
-   (Ou rode "node ferramentas/gerar-artes.mjs" na pasta do projeto: ele escreve o artes.json sozinho.)
-3. Publique a pasta de novo. A cada 5 segundos o site troca para a próxima.

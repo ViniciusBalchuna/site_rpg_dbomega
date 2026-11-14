@@ -19,3 +19,11 @@ Thumbs.db
 
 # Dependências (caso algum dia use npm)
 node_modules/
+
+# Skills do assistente (instaladas por `npx skills`; cada máquina recria as suas)
+.agents/
+skills-lock.json
+# Atalho (link simbólico) para .agents/skills, criado pelo mesmo comando
+.claude/skills/
+# Permissões e preferências pessoais do Claude Code
+.claude/settings.local.json
